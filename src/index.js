@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import { NativeBaseProvider } from "native-base"
 import AppNavigator from "./AppNavigator";
 import store from './redux/store/store';
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from "./redux/Api/apollo";
 
 LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
 LogBox.ignoreAllLogs()
@@ -11,11 +13,13 @@ LogBox.ignoreAllLogs()
 
 App = () => {
     return (
-        <Provider store={store}>
-            <NativeBaseProvider>
-                <AppNavigator />
-            </NativeBaseProvider>
-        </Provider>
+        <ApolloProvider client={apolloClient}>
+            <Provider store={store}>
+                <NativeBaseProvider>
+                    <AppNavigator />
+                </NativeBaseProvider>
+            </Provider>
+        </ApolloProvider>
     )
 }
 

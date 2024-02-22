@@ -1,14 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, StyleSheet, Text, FlatList, TouchableOpacity } from 'react-native';
 import { GlobalStyles, Colors } from '@helpers'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import TrendingProductDummy from '../items/TrendingProductDummy';
+import { ProductsMapping } from '../items/ProductsMapping';
 import OtrixDivider from '../OtrixComponent/OtrixDivider';
 import ProductView from '../ProductCompnent/ProductView';
 import Fonts from '@helpers/Fonts';
 import { logfunction } from "@helpers/FunctionHelper";
+import { useLazyQuery } from "@apollo/client";
+import { GET_PRODUCTS } from "@apis/queries"
 
 function TrendingProduct(props) {
+    const { wishlistArr } = props;
+    const [getProducts, { data }] = useLazyQuery(GET_PRODUCTS);
+    const newProduct = useMemo(() => {
+        return ProductsMapping(data)
+    }, [data])
 
     const navigateToDetailPage = (data) => {
         props.navigation.navigate('ProductDetailScreen', { id: data.id })
@@ -18,6 +25,15 @@ function TrendingProduct(props) {
         props.addToWishlist(id);
     }
 
+    useEffect(() => {
+        getProducts({
+            variables: {
+                page: 1,
+                perPage: 4,
+            }
+        });
+    }, [])
+
     const renderCard = item => {
         return (
             <View style={styles.productBox} key={item.id.toString()}>
@@ -26,7 +42,6 @@ function TrendingProduct(props) {
         );
     };
 
-    const { wishlistArr } = props;
     return (
         <>
             <View style={styles.catHeading}>
@@ -37,7 +52,7 @@ function TrendingProduct(props) {
             </View>
             <OtrixDivider size={'sm'} />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {TrendingProductDummy.map((item, index) => {
+                {newProduct.map((item, index) => {
                     return renderCard(item);
                 })}
             </View>

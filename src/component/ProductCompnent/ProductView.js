@@ -10,11 +10,13 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 function ProductView(props) {
     const data = props.data;
     const wishlistArr = props.wishlistArray ? props.wishlistArray : null;
+
     return (
         <TouchableOpacity style={styles.productBox} onPress={() => props.navToDetail(data)}>
             <View style={[styles.imageView, { backgroundColor: props.imageViewBg ? props.imageViewBg : Colors().light_white }]}>
-                <Image source={data.image} style={styles.image}
-                ></Image>
+                <Image source={{
+                    uri: data.image,
+                }} style={styles.image} />
             </View>
             <View style={styles.infromationView}>
                 <View style={styles.starView}>
