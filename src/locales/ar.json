@@ -1,0 +1,218 @@
+{
+  "commoninput": {
+    "placeholder_email": "عنوان بريد الكتروني",
+    "placeholder_password": "كلمه السر",
+    "placeholder_first_name": "الاسم الاول",
+    "placeholder_last_name": "اسم العائلة",
+    "placeholder_confirm_password": "تأكيد كلمة المرور",
+    "placeholder_phone": "رقم الهاتف",
+    "select_country": "حدد الدولة",
+    "city": "المدينة",
+    "address_1": "القطعه - الشارع - المنزل",
+    "address_2": "الطابق - الشقة  (إن وجد)",
+    "name": " الاسم الاول",
+    "postcode": "الرمز البريدي  - إن وجد "
+  },
+  "common": {
+    "label_new": "جديد",
+    "label_out_of_stock": "غير متوفر",
+    "label_in_stock": " متوفر",
+    "product_not_found": "لايوجد منتج مطابق لمعايير البحث",
+    "review": "مراجعات",
+    "enter_coupon": " ادخل كوبون الخصم"
+  },
+  "filter": {
+    "title": "فلتر",
+    "clear_all": "إزالة تصفية الفلتر",
+    "price": "السعر",
+    "price_range": "نطاق السعر",
+    "rating": "تقييم",
+    "apply_filter": "تطبيق"
+  },
+  "login": {
+    "welcome": "تسجيل الدخول",
+    "title": "أدخل بريدك الإلكتروني وكلمة المرور للدخول",
+    "button_login": "تسجيل الدخول الآن",
+    "label_registration_info": "ليس لديك حساب؟",
+    "button_registration": "سجل"
+  },
+  "registration": {
+    "title": "تسجيل",
+    "subtitle": "قم بإنشاء حساب لمتابعة التسوق مع اكتيف ستور",
+    "button_register": "سجل الان",
+    "label_login_info": "هل لديك حساب؟",
+    "button_login": "تسجيل الدخول",
+    "register_done": "تم التسجيل!",
+    "register_longtext": "اهلاً بك بعائله اكتيف ستور يمكنك الان تسجيل الدخول عن طريق الايميل المسجل والباسورد تم تسجيل عضويتك بنجاح !",
+    "register_success": "تم التسجيل بنجاح"
+  },
+  "reset_password": {
+    "title": "تغيير كلمة السر",
+    "placeholder_old_password": "كلمة سر قديمة",
+    "placeholder_new_password": "كلمة السر الجديدة",
+    "placeholder_confirm_password": "تأكيد كلمة المرور",
+    "button_reset": "تحديث"
+  },
+  "homepage": {
+    "placeholder_search": "بحث",
+    "label_category": "التصنيفات",
+    "viewall": "اظهار الكل",
+    "label_new_product": "وصل حديثاً",
+    "label_shop_by_brands": "تسوق حسب الماركات",
+    "label_dod": "عروض اليوم",
+    "label_tranding": "منتج ترند ",
+    "search_product": "البحث عن المنتجات"
+  },
+  "categories": {
+    "title": "المجموعات"
+  },
+  "brands": {
+    "title": "الماركة"
+  },
+  "account": {
+    "title": "حسابي",
+    "label_edit_profile": "تعديل الملف الشخصي",
+    "label_wishlist": "قائمة الرغبات",
+    "label_manage_address": "إدارة العناوين",
+    "label_order": "الطلبات السابقة ",
+    "label_change_password": "تغيير كلمة المرور",
+    "return": "الطلبات المرجعه",
+    "label_logout": "تسجيل خروج",
+    "wishlist_empty": "قائمة الرغبات فارغة",
+    "wishlist_add": "إضافة الآن",
+    "delete_account": "حذف الحساب"
+  },
+  "setting": {
+    "title": "الإعدادات",
+    "label_language": "اللغة",
+    "label_notification": "إعداد الإشعارات",
+    "terms_conditions": "البنود والأحكام",
+    "privacy_policy": "سياسة الخصوصية",
+    "return_refund": "سياسة الإرجاع والاسترداد",
+    "shipping_delivery": "سياسة الشحن والتوصيل",
+    "rate_app": "قيم اكتيف ستور",
+    "share_app": "انشر هذا التطبيق",
+    "about": "معلومات عنا"
+  },
+  "manage_address": {
+    "title": "عناوينك",
+    "add": "اضف العنوان",
+    "add_address": "اضف عنوان",
+    "update_address": "تعديل العنوان"
+  },
+  "orders": {
+    "your_order": "مشاهدة الطلب",
+    "buy_again": "شرائه مرة أخرى",
+    "order_detail": "تفاصيل الطلب",
+    "order_status": "الحالة",
+    "order_on": "ترتيب على"
+  },
+  "order_details": {
+    "title": "تفاصيل الطلب",
+    "view_order_detail": "عرض تفاصيل الطلبات",
+    "order_date": "تاريخ الطلب",
+    "payment_method": "طريقة الدفع",
+    "order": "رقم الطلب",
+    "order_total": "المجموع الكلي للطلب",
+    "shipping_address": "عنوان التوصيل",
+    "order_product_list": "منتجات",
+    "quantity": "كمية",
+    "rate_this_product": "قيم هذا المنتج",
+    "order_summary": "ملخص الطلب",
+    "items_count": "عدد العناصر",
+    "tax": "ضريبة",
+    "discount": "قسيمة خصم",
+    "shipping_charge": "سعر التوصيل",
+    "rate_product_now": "قيم المنتج الآن!",
+    "rate_text": "معدل النص",
+    "submit": "إرسال",
+    "order_not_found": "لايوجد طلبات مرجعه",
+    "cancel_order": "إلغاء الأمرإلغاء الطلب",
+    "cancel_order_text": "هل تريد إلغاء هذا الطلب؟",
+    "cancel_text": "سبب الإلغاء"
+  },
+  "language_screen": {
+    "english": "الإنجليزية",
+    "arabic": "العربية"
+  },
+  "notification": {
+    "title": "إعدادات الإشعارات",
+    "enable_notification": "تفعيل الاشعارات لـ",
+    "for_you": "لك",
+    "Categories_wise": "فئات التنبية الحكيم",
+    "save": "حفظ"
+  },
+  "product_details": {
+    "review": "رأي المشتريين",
+    "description": "وصف",
+    "specification": "تخصيص",
+    "overall_rating": "تقييم عام",
+    "based_on": "مرتكز على",
+    "excellent": "ممتاز",
+    "good": "جيد",
+    "avg": "متوسط",
+    "poor": "سيء",
+    "very_bad": "سيئ جدا",
+    "similar": "منتجات مشابهة",
+    "add_to_cart": "أضف إلى السلة",
+    "color": "الألوان",
+    "size": "الأحجام"
+  },
+  "cart": {
+    "title": "عربة التسوق",
+    "coupon_code": "استخدم الكوبون ",
+    "coupon": " الكوبون ",
+    "sub_total": "المجموع الفرعي للطلب",
+    "total": "المجموع الكلي للطلب",
+    "checkout": "الدفع",
+    "apply": "تطبيق",
+    "confirm": "ملاحظة",
+    "are_you_sure": "هل تريد الاستمرار بدون تسجيل دخول",
+    "yes_continue": "استمر كزائر",
+    "login_now": "تسجيل دخول",
+    "seach_product": "بحث عن منتجات"
+  },
+  "checkout": {
+    "address": "عنوان",
+    "payment": "دفع",
+    "delivery_address": "عنوان التسليم",
+    "shipping_method": "طريقة التوصيل",
+    "add_new_address": "أضف عنوان جديد",
+    "proceed": "الاستمرار",
+    "payment_methods": "طريقة الدفع",
+    "credit_debit": "كي نت",
+    "cod": "الدفع عند الاستلام",
+    "order_comments": "أضف تعليقاتك",
+    "enter_order_comments": "أضف تعليقاتك (اختياري)",
+    "order_summary": "ملخص الطلب",
+    "place_order": "تقديم الطلب ",
+    "payment_confirm": "تم تأكيد عملية الدفع",
+    "payment_desc": "تم استقبال طلبك بنجاح - سوف تصلك رسالة نصية قريباً لاخبارك بموعد التوصيل",
+    "continue_shopping": "متابعة التسوق",
+    "view_order": "مشاهدة الطلب",
+    "personal": "معلوماتك الشخصية:",
+    "state": "حدد المحافظة",
+    "continue": "متابعة",
+    "next": "التالي",
+    "step": "الخطوة الاولى",
+    "step2": "الخطوة الثانية",
+    "step3": "الخطوة الثالثة",
+    "step4": "Step 4",
+    "charges": "رسوم التوصيل",
+    "order_comment_placeholder": "اكتب تعليق اضافي ( اختاري)"
+  },
+  "search": {
+    "most_searchs": "معظم عمليات البحث"
+  },
+  "return": {
+    "title": "عائدات",
+    "your_request": "طلبات الإرجاع الخاصة بك",
+    "return_not": "لم يتم العثور على العودة",
+    "return_id": "معرّف الإرجاع",
+    "order_id": "رقم التعريف الخاص بالطلب",
+    "date_added": "تم إضافة التاريخ",
+    "status": "حالة",
+    "not_found": "لم يتم العثور على العودة",
+    "return_product": "إرجاع المنتج"
+  }
+}
