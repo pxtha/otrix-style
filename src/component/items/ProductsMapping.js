@@ -9,13 +9,14 @@ export const ProductsMapping = (data) => {
         return ({
             id: product.id,
             image: images[0],
+            images: images,
             name: product.attributes.product_name,
             price: product.attributes.price,
             off: product.attributes.sale_price ?? "",
-            rating: 5,
+            rating: data.rating ?? 5,
             new: !!product.attributes.is_new,
             isFav: !!product.attributes.is_top,
-            out_of_stock: product.attributes.stock < 0
+            out_of_stock: product.attributes.stock < 0,
         })
     })
 }
@@ -26,12 +27,14 @@ export const ProductMapping = (data) => {
     return ({
         id: data.id,
         image: images[0],
+        images: images,
         name: data.attributes.product_name,
         price: data.attributes.price,
         off: data.attributes.sale_price ?? "",
-        rating: 5,
+        rating: data.rating ?? 5,
         new: !!data.attributes.is_new,
         isFav: !!data.attributes.is_top,
-        out_of_stock: data.attributes.stock < 0
+        out_of_stock: data.attributes.stock < 0,
+        description: data.attributes.description
     })
 }

@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet, Text, FlatList } from 'react-native';
 import { GlobalStyles, Colors } from '@helpers'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import SimilarDummy from '../items/SimilarDummy';
 import OtrixDivider from '../OtrixComponent/OtrixDivider';
 import Fonts from '@helpers/Fonts';
 import ProductView from './ProductView';
@@ -22,7 +21,7 @@ function SimilarProduct(props) {
             <OtrixDivider size={'sm'} />
             <FlatList
                 style={{ padding: wp('1%') }}
-                data={SimilarDummy}
+                data={props.similarProduct}
                 showsHorizontalScrollIndicator={false}
                 horizontal={true}
                 contentContainerStyle={{

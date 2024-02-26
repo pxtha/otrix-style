@@ -1,38 +1,53 @@
-import React, { useEffect, } from "react";
-import {
-    View,
-    TouchableOpacity,
-    Text,
-    StyleSheet,
-    Modal,
-    Image
-} from "react-native";
-import { connect } from 'react-redux';
+import { addToCart } from '@actions';
+import { GET_PRODUCT } from "@apis/queries";
+import { useQuery } from '@apollo/client';
+import { bottomCart, checkround2, close } from '@common';
 import {
     OtrixContainer, OtrixContent, OtrixDivider, OtrixAlert, OtirxBackButton, OtrixLoader, SimilarProduct, SizeContainerComponent, RatingComponent
 } from '@component';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { GlobalStyles, Colors } from '@helpers';
-import { _roundDimensions } from '@helpers/util';
-import ProductListDummy from '@component/items/ProductListDummy';
-import { bottomCart, checkround2, close } from '@common';
+import { Colors, GlobalStyles } from '@helpers';
+import { useRoute } from '@react-navigation/native';
+import { Badge, Button, ScrollView } from "native-base";
+import React, { useEffect, useMemo, } from "react";
+import {
+    Image,
+    Modal,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import { SliderBox } from 'react-native-image-slider-box';
-import { Badge, ScrollView, Button } from "native-base";
-import Fonts from "../helpers/Fonts";
-import { addToCart } from '@actions';
-import Icon from 'react-native-vector-icons/AntDesign'
+import ImageViewer from 'react-native-image-zoom-viewer';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import Stars from 'react-native-stars';
+import Icon from 'react-native-vector-icons/AntDesign';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIconsIcon from 'react-native-vector-icons/MaterialIcons';
-import ImageViewer from 'react-native-image-zoom-viewer';
-import Stars from 'react-native-stars';
+import { connect } from 'react-redux';
+import { ProductMapping } from "../component/items/ProductsMapping";
+import { SimilarProductsMapping } from "../component/items/SimilarProductsMapping";
+import Fonts from "../helpers/Fonts";
 
 const COLORS = ['#3ad35c', Colors().themeColor, '#efcd19', '#ff1e1a'];
 
 function ProductDetailScreen(props) {
+    const { id } = useRoute().params;
     const [state, setState] = React.useState({ loading: true, productCount: 1, cartCountState: props?.cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
-    const { loading, productDetail, selectedColor, productCount, zoomImages, cartCountState, showZoom, fetchCart } = state;
+    const { loading, selectedColor, productCount, zoomImages, cartCountState, showZoom, fetchCart } = state;
     const [msg, setMsg] = React.useState({ message: null, type: null })
     const { message, type } = msg;
+
+    const { data } = useQuery(GET_PRODUCT, { variables: { slug: parseInt(id) } });
+    const productDetail = useMemo(() => {
+        if (!data || !data.productOne.single) return {};
+        return ProductMapping(data.productOne.single.data)
+    }, [data])
+
+    const similarProduct = useMemo(() => {
+        if (!data || !data.productOne.related) return [];
+        return SimilarProductsMapping(data.productOne.related)
+    }, [data])
 
     const _CartData = () => {
         setState({ ...state, fetchCart: false, cartCountState: props.cartCount })
@@ -59,22 +74,20 @@ function ProductDetailScreen(props) {
     const { cartCount, strings } = props;
 
     useEffect(() => {
-        const { id } = props.route.params;
-
-        let findProduct = ProductListDummy.filter(p => p.id == id);
+        // let findProduct = productDetail.filter(p => p.id == id);
 
         //zoom images
         let zoomImages = [];
-        findProduct[0].images.length > 0 && findProduct[0].images.forEach(function (item) {
-            zoomImages.push({
-                url: '',
-                props: {
-                    source: item
-                }
-            })
-        });
+        // productDetail.images.length > 0 && productDetail.images.forEach(function (item) {
+        //     zoomImages.push({
+        //         url: item,
+        //         props: {
+        //             source: item
+        //         }
+        //     })
+        // });
 
-        let loadPage = setTimeout(() => setState({ ...state, loading: false, productDetail: findProduct[0], zoomImages }), 100);
+        let loadPage = setTimeout(() => setState({ ...state, loading: false, productDetail: productDetail, zoomImages }), 100);
 
         return () => {
             clearTimeout(loadPage);
@@ -82,6 +95,7 @@ function ProductDetailScreen(props) {
     }, [cartCountState < cartCount && _CartData()]);
 
 
+    console.log(data, productDetail)
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
@@ -90,7 +104,7 @@ function ProductDetailScreen(props) {
 
                     {/* Product Detail View */}
                     {
-                        productDetail && productDetail.images.length > 0 &&
+                        productDetail && productDetail?.images?.length &&
                         <View style={styles.container} >
                             <SliderBox images={productDetail.images}
                                 onCurrentImagePressed={index => setState({ ...state, showZoom: true })}
@@ -164,6 +178,7 @@ function ProductDetailScreen(props) {
                                 </View>
 
                                 {/* Heart Icon */}
+                                {/* TODO: Need to handle */}
                                 <View style={styles.heartIconView}>
                                     {
                                         productDetail.isFav ? <TouchableOpacity style={[GlobalStyles.FavCircle, { left: wp('12%'), top: 0 }]} >
@@ -201,7 +216,7 @@ function ProductDetailScreen(props) {
                                         halfStar={<FontAwesomeIcon name={'star-half-empty'} size={wp('3.5%')} style={[styles.myStarStyle]} />}
                                         disabled={true}
                                     />
-                                    <Text style={styles.reviewTxt}>({productDetail.reviewCount} {strings.product_details.review})</Text>
+                                    <Text style={styles.reviewTxt}>({productDetail?.reviewCount ?? 0} {strings.product_details.review})</Text>
                                 </View>
                             </View>
                             <OtrixDivider size={'lg'} />
@@ -209,7 +224,7 @@ function ProductDetailScreen(props) {
                             <OtrixDivider size={'md'} />
 
                             {/* Sizes Container*/}
-                            <SizeContainerComponent productData={productDetail} />
+                            {/* <SizeContainerComponent productData={productDetail} /> */}
 
                             <OtrixDivider size={'md'} />
 
@@ -225,7 +240,7 @@ function ProductDetailScreen(props) {
                             <RatingComponent strings={strings} productData={productDetail} />
 
                             {/* Similar Product Component */}
-                            <SimilarProduct strings={strings} navigation={props.navigation} />
+                            <SimilarProduct strings={strings} navigation={props.navigation} similarProduct={similarProduct} />
 
                         </ScrollView>
                     </OtrixContent>

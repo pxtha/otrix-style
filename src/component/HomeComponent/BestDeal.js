@@ -28,6 +28,7 @@ function BestDeal(props) {
     const { wishlistArr } = props;
 
     const formatData = () => {
+        if (!props.dealProducts) return [];
         return Object.entries(props.dealProducts).map(([key, value]) => {
             if (typeof value !== 'string') {
                 return ProductMapping(value.data)

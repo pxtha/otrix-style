@@ -17,7 +17,7 @@ function SizeContainerComponent(props) {
             <Text style={styles.containerTxt}>Available Sizes:</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: wp('1%') }}>
                 {
-                    productDetail.sizes.length > 0 && productDetail.sizes.map((item, index) =>
+                    [6, 7, 8.5, 32, 36].length > 0 && [6, 7, 8.5, 32, 36].map((item, index) =>
                         <TouchableOpacity style={[styles.box, styles.sizeBox, { borderColor: selectedSize == item ? Colors().themeColor : 'rgb(225, 225, 225)' }]} key={index} onPress={() => setState({ ...state, selectedSize: item })}>
                             <Text style={[styles.sizeTxt, { color: selectedSize == item ? Colors().themeColor : Colors().secondry_text_color }]}>{item}</Text>
                         </TouchableOpacity>
