@@ -1,21 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, SafeAreaView, Image } from 'react-native';
-import { GlobalStyles, Colors, } from '@helpers'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { ProductsMapping } from '../items/ProductsMapping';
+import { Colors, GlobalStyles } from '@helpers';
+import React, { memo } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import OtrixDivider from '../OtrixComponent/OtrixDivider';
 import ProductView from '../ProductCompnent/ProductView';
-import { logfunction } from "@helpers/FunctionHelper";
-import { GET_PRODUCTS } from "@apis/queries"
-import { useLazyQuery } from "@apollo/client";
+import { ProductsMapping } from '../items/ProductsMapping';
 
 function NewProduct(props) {
     const { wishlistArr } = props;
-    const [getProducts, { data }] = useLazyQuery(GET_PRODUCTS);
-    const newProduct = useMemo(() => {
-        return ProductsMapping(data)
-    }, [data])
-    
+
     const navigateToDetailPage = (data) => {
         props.navigation.navigate('ProductDetailScreen', { id: data.id })
     }
@@ -34,15 +27,6 @@ function NewProduct(props) {
         );
     };
 
-    useEffect(() => {
-        getProducts({
-            variables: {
-                page: 1,
-                perPage: 4,
-            }
-        });
-    }, [])
-
     return (
         <>
             <View style={styles.catHeading}>
@@ -53,7 +37,7 @@ function NewProduct(props) {
             </View>
             <OtrixDivider size={'sm'} />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {newProduct.map((item, index) => {
+                {ProductsMapping(props.newProducts).map((item, index) => {
                     return renderCard(item);
                 })}
             </View>
@@ -61,7 +45,7 @@ function NewProduct(props) {
     )
 }
 
-export default NewProduct;
+export default memo(NewProduct);
 
 const styles = StyleSheet.create({
     catHeading: {
