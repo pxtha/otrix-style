@@ -597,6 +597,29 @@ query Home {
             }
           }
         }
+        banner {
+          top {
+            data {
+              attributes {
+                url
+              }
+            }
+          }
+         mid {
+            data {
+              attributes {
+                url
+              }
+            }
+          }
+           bottom {
+            data {
+              attributes {
+                url
+              }
+            }
+          }
+        }
       }
     }
   }

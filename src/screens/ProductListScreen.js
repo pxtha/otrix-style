@@ -22,7 +22,7 @@ import { _addToWishlist, _getWishlist, logfunction } from "@helpers/FunctionHelp
 import { ProductListSkeleton } from '@skeleton';
 import { GET_PRODUCTS, GET_FILTERS } from '@apis/queries';
 import { useLazyQuery, useQuery } from '@apollo/client';
-import { filterMapping } from "../component/items/FilterTagsDummy";
+import { filterMapping } from "../component/items/FilterMapping";
 import { ProductsMapping } from "../component/items/ProductsMapping";
 
 function ProductListScreen(props) {

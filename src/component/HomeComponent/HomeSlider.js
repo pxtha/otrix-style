@@ -1,20 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, Image, Dimensions, I18nManager } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { homeSlider1, homeSlider2, homeSlider3, homeSlider4 } from '@common';
 
 const { width: screenWidth } = Dimensions.get('window')
 import Carousel from 'react-native-reanimated-carousel';
 const width = Dimensions.get('window').width;
 
 function Slider(props) {
-    const images = [
-        { image: homeSlider1, id: '1' },
-        { image: homeSlider2, id: '2' },
-        { image: homeSlider3, id: '3' },
-        { image: homeSlider4, id: '4' },
+    const images = useMemo(() => {
+        if (!props.images) return [];
+        return props.images.map((v, index) => ({ image: v, id: index }))
+    }, [props])
 
-    ];
     const viewCount = 5;
 
     let snapDirection = 'left';
@@ -51,7 +48,7 @@ function Slider(props) {
                             justifyContent: 'center',
                         }}
                     >
-                        <Image source={item.image} resizeMode="contain" style={{ height: hp('100%'), width: '100%' }} />
+                        <Image source={{ uri: item.image }} resizeMode="contain" style={{ height: hp('100%'), width: '100%' }} />
                     </View>
                 )}
             />
