@@ -22,13 +22,16 @@ import { _roundDimensions } from '@helpers/util';
 import { _addToWishlist, logfunction } from "@helpers/FunctionHelper";
 import { useQuery } from "@apollo/client";
 import { GET_HOME_DATA } from "@apis/queries"
+import { bannerMapping } from "@component/items/BannerMapping.js"
 
 function HomeScreen(props) {
     const { data } = useQuery(GET_HOME_DATA);
-    const { deal, new_arrival, trending, vendor } = data?.home?.data?.attributes || {}
+    const { deal, new_arrival, trending, banner } = data?.home?.data?.attributes || {}
     const [state, setState] = React.useState({ notificationCount: 9, loading: true });
     const { loading } = state;
     const { authStatus, wishlistData, strings, wishlistCount } = props;
+    const offerBanner = bannerMapping(banner).filter(v => v !== null);
+    const [bannerTop, bannerMid, bannerBot] = offerBanner;
 
     const addToWish = async (id) => {
         let wishlistData = await _addToWishlist(id);
@@ -117,23 +120,23 @@ function HomeScreen(props) {
                         <HomeCategoryView navigation={props.navigation} strings={strings} />
 
                         {/* HomeSlider Component */}
-                        {/* <HomeSlider />
-                        <OtrixDivider size={'md'} /> */}
+                        <HomeSlider images={bannerTop.top} />
+                        <OtrixDivider size={'md'} />
 
                         {/* NewProduct Component */}
                         <NewProduct navigation={props.navigation} wishlistArr={wishlistData} addToWishlist={addToWish} strings={strings} newProducts={new_arrival} />
 
                         {/* Banner Image */}
-                        {/* <Image source={offerBanner} style={styles.bannerStyle} />
-                        <OtrixDivider size={'sm'} /> */}
+                        <HomeSlider images={bannerMid.mid} />
+                        <OtrixDivider size={'sm'} />
 
                         {/* BestDeal Component */}
                         <BestDeal strings={strings} navigation={props.navigation} wishlistArr={wishlistData} addToWishlist={addToWish} dealProducts={deal} />
                         <OtrixDivider size={'sm'} />
 
                         {/* Banner Image */}
-                        {/* <Image source={offerBanner2} style={[styles.bannerStyle, { resizeMode: 'cover' }]} resizeMode="cover" />
-                        <OtrixDivider size={'sm'} /> */}
+                        <HomeSlider images={bannerBot.bottom} />
+                        <OtrixDivider size={'sm'} />
 
                         {/* TrendingProduct Component */}
                         <TrendingProduct strings={strings} navigation={props.navigation} wishlistArr={wishlistData} addToWishlist={addToWish} trendingProducts={trending} />
