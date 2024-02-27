@@ -12,7 +12,7 @@ function FilterTags(props) {
     }
 
     return (
-        <TouchableOpacity style={[styles.filterBox, selectedTag ? styles.borderBox : styles.unborderBox]} onPress={() => props.onFilterPress(props.tagID)}>
+        <TouchableOpacity style={[styles.filterBox, selectedTag ? styles.borderBox : styles.unborderBox]} onPress={() => props.onFilterPress(props.tagID, 'tags')}>
             {selectedTag && <Image source={checkaround} style={styles.imageView} />}
             <Text style={styles.tagStyle}>
                 {props.tagName}

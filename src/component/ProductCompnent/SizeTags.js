@@ -12,7 +12,7 @@ function SizeTags(props) {
     }
 
     return (
-        <TouchableOpacity style={[styles.filterBox, selectedTag && styles.borderBox]} onPress={() => props.onFilterPress(props.tagID)}>
+        <TouchableOpacity style={[styles.filterBox, selectedTag && styles.borderBox]} onPress={() => props.onFilterPress(props.tagID, 'sizes')}>
             {selectedTag && <Image source={checkaround} style={styles.imageView} />}
             <Text style={styles.tagStyle}>
                 {props.tagName}
