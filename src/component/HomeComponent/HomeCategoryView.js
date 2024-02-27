@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, Text, FlatList, Image, TouchableOpacity } from 'react-native';
 import { GlobalStyles, Colors } from '@helpers'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import CategoryDummy from '../items/CategoryDummy';
 import OtrixDivider from '../OtrixComponent/OtrixDivider';
 import Fonts from '@helpers/Fonts';
+import { categoryMapping } from '@component/items/CategoryMapping';
+import { GET_CATEGORIES } from '@apis/queries';
+import { useQuery } from "@apollo/client";
 
 function HomeCategoryView(props) {
     loadImage = false;
+    const { data } = useQuery(GET_CATEGORIES);
+
+    const categories = useMemo(() => {
+        if (!data) return [];
+        return categoryMapping(data.categories.data)
+    }, [data])
+
     return (
         <View>
             <View style={styles.catHeading} >
@@ -19,7 +28,7 @@ function HomeCategoryView(props) {
             <OtrixDivider size={'sm'} />
             <FlatList
                 style={{ padding: wp('1%') }}
-                data={CategoryDummy}
+                data={categories}
                 contentContainerStyle={{ paddingRight: wp('3%') }}
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
@@ -28,7 +37,7 @@ function HomeCategoryView(props) {
                 renderItem={({ item, index }) =>
                     <TouchableOpacity style={styles.catBox} key={item.id} onPress={() => props.navigation.navigate('ProductListScreen', { title: item.name })}>
                         <View style={styles.imageContainer}>
-                            <Image source={item.image} style={styles.imageView}
+                            <Image source={{ uri: item.image }} style={styles.imageView}
                             ></Image>
                         </View>
                         <Text numberOfLines={2} style={styles.catName}>{item.name}</Text>

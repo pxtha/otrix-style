@@ -14,10 +14,18 @@ import { GlobalStyles, Colors } from '@helpers';
 import Fonts from "@helpers/Fonts";
 import Fontisto from 'react-native-vector-icons/Fontisto';
 import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
-import CategoryDummy from '@component/items/CategoryDummy';
 import { Button } from 'native-base';
+import { categoryMapping } from '@component/items/CategoryMapping';
+import { GET_CATEGORIES } from '@apis/queries';
+import { useQuery } from "@apollo/client";
 
 function NotificationScreen(props) {
+    const { data } = useQuery(GET_CATEGORIES);
+
+    const categories = useMemo(() => {
+        if (!data) return [];
+        return categoryMapping(data.categories.data)
+    }, [data])
 
     const [state, setState] = React.useState({ foryouchk: true, categoriesSelectedArr: [] });
     const { foryouchk, categoriesSelectedArr } = state;
@@ -78,7 +86,7 @@ function NotificationScreen(props) {
                 <Text style={styles.title}>{strings.notification.Categories_wise}</Text>
                 <OtrixDivider size={'sm'} />
                 {
-                    CategoryDummy.length > 0 && CategoryDummy.map((item, index) =>
+                    categories.length > 0 && categories.map((item, index) =>
                         <View style={styles.box}>
 
                             <TouchableOpacity key={index} style={styles.checkboxContent} onPress={() => addToArr(item.id)}>

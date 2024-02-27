@@ -1,37 +1,44 @@
-import React, { useEffect, useMemo } from "react";
-import {
-    View,
-    TouchableOpacity,
-    Text,
-    StyleSheet,
-    Image,
-} from "react-native";
-import { connect } from 'react-redux';
-import {
-    OtrixHeader, OtrixContainer, OtrixContent, OtrixDivider, HomeSlider, HomeManufacturerView,
-    HomeCategoryView, SearchBar, NewProduct, TrendingProduct, BestDeal
-} from '@component';
-import { HomeSkeleton } from '@skeleton';
 import { addToWishList } from '@actions';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { Colors, GlobalStyles } from '@helpers';
-import { Avatar, Badge } from "native-base";
-import { heart, offerBanner, offerBanner2, avatarImg, avatarImg2 } from '@common';
-import Fonts from "@helpers/Fonts";
-import { _roundDimensions } from '@helpers/util';
-import { _addToWishlist, logfunction } from "@helpers/FunctionHelper";
+import { GET_HOME_DATA } from "@apis/queries";
 import { useQuery } from "@apollo/client";
-import { GET_HOME_DATA } from "@apis/queries"
-import { bannerMapping } from "@component/items/BannerMapping.js"
+import { avatarImg, avatarImg2, heart } from '@common';
+import {
+    BestDeal,
+    HomeCategoryView,
+    HomeSlider,
+    NewProduct,
+    OtrixContainer, OtrixContent, OtrixDivider,
+    OtrixHeader,
+    SearchBar,
+    TrendingProduct
+} from '@component';
+import { bannerMapping } from "@component/items/BannerMapping.js";
+import { Colors, GlobalStyles } from '@helpers';
+import Fonts from "@helpers/Fonts";
+import { _addToWishlist } from "@helpers/FunctionHelper";
+import { _roundDimensions } from '@helpers/util';
+import { HomeSkeleton } from '@skeleton';
+import { Badge } from "native-base";
+import React, { useEffect } from "react";
+import {
+    Image,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { connect } from 'react-redux';
 
 function HomeScreen(props) {
     const { data } = useQuery(GET_HOME_DATA);
+
     const { deal, new_arrival, trending, banner } = data?.home?.data?.attributes || {}
     const [state, setState] = React.useState({ notificationCount: 9, loading: true });
     const { loading } = state;
     const { authStatus, wishlistData, strings, wishlistCount } = props;
     const offerBanner = bannerMapping(banner).filter(v => v !== null);
-    const [bannerTop, bannerMid, bannerBot] = offerBanner;
+    const [bannerTop = {}, bannerMid = {}, bannerBot = {}] = offerBanner;
 
     const addToWish = async (id) => {
         let wishlistData = await _addToWishlist(id);

@@ -705,3 +705,22 @@ mutation createR($name:String, $comment:String,$email:String,$rating:Int,$produc
   }
 }
 `
+
+export const GET_CATEGORIES = gql`
+query Cat {
+   categories {
+    data {
+      id
+      attributes {
+        name
+        images {
+          data {
+             attributes {
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+}`
