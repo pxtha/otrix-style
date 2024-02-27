@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, FlatList, TouchableOpacity } from 'react-native';
-import { GlobalStyles, Colors } from '@helpers'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import DealProductDummy from '../items/DealProductDummy';
-import OtrixDivider from '../OtrixComponent/OtrixDivider';
-import DealsProductView from './DealsProductView';
+import { Colors, GlobalStyles } from '@helpers';
 import Fonts from '@helpers/Fonts';
+import React, { memo } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import OtrixDivider from '../OtrixComponent/OtrixDivider';
+import { ProductMapping } from '../items/ProductsMapping';
+import DealsProductView from './DealsProductView';
 
 function BestDeal(props) {
 
@@ -26,6 +26,16 @@ function BestDeal(props) {
     };
 
     const { wishlistArr } = props;
+
+    const formatData = () => {
+        if (!props.dealProducts) return [];
+        return Object.entries(props.dealProducts).map(([key, value]) => {
+            if (typeof value !== 'string') {
+                return ProductMapping(value.data)
+            }
+        }).filter(data => data !== undefined)
+    }
+
     return (
         <>
             <View style={styles.catHeading}>
@@ -36,7 +46,7 @@ function BestDeal(props) {
             </View>
             <OtrixDivider size={'sm'} />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {DealProductDummy.map((item, index) => {
+                {formatData().map((item, index) => {
                     return renderCard(item);
                 })}
             </View>
@@ -46,7 +56,7 @@ function BestDeal(props) {
     )
 }
 
-export default BestDeal;
+export default memo(BestDeal);
 
 const styles = StyleSheet.create({
     catHeading: {

@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, FlatList, TouchableOpacity } from 'react-native';
-import { GlobalStyles, Colors } from '@helpers'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import TrendingProductDummy from '../items/TrendingProductDummy';
+import { Colors, GlobalStyles } from '@helpers';
+import Fonts from '@helpers/Fonts';
+import React, { memo } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import OtrixDivider from '../OtrixComponent/OtrixDivider';
 import ProductView from '../ProductCompnent/ProductView';
-import Fonts from '@helpers/Fonts';
-import { logfunction } from "@helpers/FunctionHelper";
+import { ProductsMapping } from '../items/ProductsMapping';
 
 function TrendingProduct(props) {
+    const { wishlistArr } = props;
 
     const navigateToDetailPage = (data) => {
         props.navigation.navigate('ProductDetailScreen', { id: data.id })
@@ -26,18 +26,17 @@ function TrendingProduct(props) {
         );
     };
 
-    const { wishlistArr } = props;
     return (
         <>
             <View style={styles.catHeading}>
-                <Text style={GlobalStyles.boxHeading}>{props.strings.homepage.label_tranding}</Text>
+                <Text style={GlobalStyles.boxHeading}>{props.strings.homepage.label_trending}</Text>
                 <TouchableOpacity style={{ flex: 0.50 }} onPress={() => props.navigation.navigate('ProductListScreen', { title: 'Trending Products' })}>
                     <Text style={GlobalStyles.viewAll}>{props.strings.homepage.viewall}</Text>
                 </TouchableOpacity>
             </View>
             <OtrixDivider size={'sm'} />
             <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                {TrendingProductDummy.map((item, index) => {
+                {ProductsMapping(props.trendingProducts).map((item, index) => {
                     return renderCard(item);
                 })}
             </View>
@@ -45,7 +44,7 @@ function TrendingProduct(props) {
     )
 }
 
-export default TrendingProduct;
+export default memo(TrendingProduct);
 
 const styles = StyleSheet.create({
     catHeading: {

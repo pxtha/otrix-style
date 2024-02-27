@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { GlobalStyles, Colors } from '@helpers'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -13,7 +13,7 @@ function DealsProductView(props) {
     return (
         <TouchableOpacity style={styles.productBox} onPress={() => props.navToDetail(data)}>
             <View style={styles.imageView}>
-                <Image source={data.image} style={styles.image}></Image>
+                <Image source={{ uri: data.image }} style={styles.image}></Image>
             </View>
             <View style={styles.infromationView}>
                 <View style={styles.starView}>
@@ -63,7 +63,7 @@ function DealsProductView(props) {
     )
 }
 
-export default DealsProductView;
+export default memo(DealsProductView);
 
 const styles = StyleSheet.create({
     productBox: {
