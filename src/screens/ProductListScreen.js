@@ -31,9 +31,9 @@ function ProductListScreen(props) {
             tags: [],
             colour: [],
             sizes: []
-        }, wishlistArr: [], filterModelVisible: false, loading: true
+        }, filterModelVisible: false
     });
-    const [getProducts, { data: productList, error }] = useLazyQuery(GET_PRODUCTS);
+    const [getProducts, { data: productList, error, loading }] = useLazyQuery(GET_PRODUCTS);
     const { data } = useQuery(GET_FILTERS);
 
     const colourFilter = useMemo(() => {
@@ -55,7 +55,6 @@ function ProductListScreen(props) {
     //when filter tag clicked
     const filterClick = (value, key) => {
         const { selectedFilters } = state;
-        console.log(value, key, selectedFilters)
         if (selectedFilters[key].includes(value)) {
             const index = selectedFilters[key].indexOf(value);
             if (index > -1) {
@@ -105,30 +104,23 @@ function ProductListScreen(props) {
     }
 
     const { title } = props.route.params;
-    const { selectedFilters, loading, filterModelVisible, } = state;
+    const { selectedFilters, filterModelVisible, } = state;
     const { wishlistData, strings } = props;
 
-    useEffect(async () => {
-        let wishlistData = await _getWishlist();
-        let loadPage = setTimeout(() => setState({ ...state, loading: false, wishlistArr: wishlistData }), 500);
-        // logfunction(" wishlist Data ", wishlistData)
-
-        return () => {
-            clearTimeout(loadPage);
-        };
-    }, []);
-
     useEffect(() => {
+        console.log(selectedFilters.tags)
         getProducts({
             variables: {
+                color: selectedFilters.colour ? selectedFilters.colour : [],
+                size: selectedFilters.sizes ? selectedFilters.sizes : [],
+                category: selectedFilters.tags ? selectedFilters.tags[0] : undefined,
                 page: 1,
                 perPage: 10,
                 list: true
             }
         });
-
-        // scrollToPageContent();
-    }, [])
+    }, [selectedFilters.colour.length, selectedFilters.sizes.length, selectedFilters.tags.length])
+    
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
