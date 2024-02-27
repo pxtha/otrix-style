@@ -1,4 +1,4 @@
-import React, { useEffect, } from "react";
+import React, { useEffect, useMemo, } from "react";
 import {
     View,
     TouchableOpacity,
@@ -16,43 +16,67 @@ import {
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { GlobalStyles, Colors } from '@helpers';
 import { _roundDimensions } from '@helpers/util';
-import FilterTagsDummy from '@component/items/FilterTagsDummy';
 import { addToWishList } from '@actions';
-import ProductListDummy from '@component/items/ProductListDummy';
 import { filter } from '@common';
 import { _addToWishlist, _getWishlist, logfunction } from "@helpers/FunctionHelper";
 import { ProductListSkeleton } from '@skeleton';
+import { GET_PRODUCTS, GET_FILTERS } from '@apis/queries';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { filterMapping } from "../component/items/FilterTagsDummy";
+import { ProductsMapping } from "../component/items/ProductsMapping";
 
 function ProductListScreen(props) {
-    const [state, setState] = React.useState({ selectedFilters: [], wishlistArr: [], filterModelVisible: false, loading: true });
+    const [state, setState] = React.useState({
+        selectedFilters: {
+            tags: [],
+            colour: [],
+            sizes: []
+        }, wishlistArr: [], filterModelVisible: false, loading: true
+    });
+    const [getProducts, { data: productList, error }] = useLazyQuery(GET_PRODUCTS);
+    const { data } = useQuery(GET_FILTERS);
 
-    useEffect(async () => {
-        let wishlistData = await _getWishlist();
-        let loadPage = setTimeout(() => setState({ ...state, loading: false, wishlistArr: wishlistData }), 500);
-
-        return () => {
-            clearTimeout(loadPage);
-        };
-    }, []);
+    const colourFilter = useMemo(() => {
+        if (data && data.sizes.data) {
+            return filterMapping(data.productVariants.data, 'color')
+        }
+    }, [data])
+    const sizesFilter = useMemo(() => {
+        if (data && data.sizes.data) {
+            return filterMapping(data.sizes.data, 'name')
+        }
+    }, [data])
+    const tagsFilter = useMemo(() => {
+        if (data && data.sizes.data) {
+            return filterMapping(data.categories.data, 'name')
+        }
+    }, [data])
 
     //when filter tag clicked
-    const filterClick = (value) => {
+    const filterClick = (value, key) => {
         const { selectedFilters } = state;
-        if (selectedFilters.includes(value)) {
-            const index = selectedFilters.indexOf(value);
+        console.log(value, key, selectedFilters)
+        if (selectedFilters[key].includes(value)) {
+            const index = selectedFilters[key].indexOf(value);
             if (index > -1) {
-                selectedFilters.splice(index, 1);
+                selectedFilters[key].splice(index, 1);
             }
             setState({
                 ...state,
-                selectedFilters: selectedFilters
+                selectedFilters: {
+                    ...selectedFilters,
+                    [key]: selectedFilters[key]
+                }
             })
 
         }
         else {
             setState({
                 ...state,
-                selectedFilters: [...selectedFilters, value]
+                selectedFilters: {
+                    ...selectedFilters,
+                    [key]: [...selectedFilters[key], value]
+                }
             });
         }
     }
@@ -61,6 +85,17 @@ function ProductListScreen(props) {
         setState({
             ...state,
             filterModelVisible: false
+        });
+    }
+
+    const clearFilterModel = () => {
+        setState({
+            ...state,
+            selectedFilters: {
+                tags: [],
+                colour: [],
+                sizes: []
+            }
         });
     }
 
@@ -73,6 +108,27 @@ function ProductListScreen(props) {
     const { selectedFilters, loading, filterModelVisible, } = state;
     const { wishlistData, strings } = props;
 
+    useEffect(async () => {
+        let wishlistData = await _getWishlist();
+        let loadPage = setTimeout(() => setState({ ...state, loading: false, wishlistArr: wishlistData }), 500);
+        // logfunction(" wishlist Data ", wishlistData)
+
+        return () => {
+            clearTimeout(loadPage);
+        };
+    }, []);
+
+    useEffect(() => {
+        getProducts({
+            variables: {
+                page: 1,
+                perPage: 10,
+                list: true
+            }
+        });
+
+        // scrollToPageContent();
+    }, [])
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
@@ -93,8 +149,8 @@ function ProductListScreen(props) {
             <View style={{ height: hp('6%') }}>
                 <ScrollView style={{ flexDirection: 'row', marginHorizontal: wp('1%') }} horizontal={true} showsHorizontalScrollIndicator={false} >
                     {
-                        FilterTagsDummy.map((item, index) =>
-                            <FilterTags strings={strings} tagName={item.name} tagID={item.id} key={item.id} selected={selectedFilters} onFilterPress={filterClick} />
+                        tagsFilter?.map((item, index) =>
+                            <FilterTags strings={strings} tagName={item.name} tagID={item.id} key={item.id} selected={selectedFilters.tags} onFilterPress={filterClick} />
                         )
                     }
                 </ScrollView>
@@ -107,7 +163,7 @@ function ProductListScreen(props) {
                     <View style={styles.content}>
                         < FlatList
                             style={{ padding: wp('1%') }}
-                            data={ProductListDummy}
+                            data={ProductsMapping(productList)}
                             scrollEnabled={true}
                             horizontal={false}
                             numColumns={2}
@@ -123,7 +179,7 @@ function ProductListScreen(props) {
             }
             {/* Fitler Model Start From Here */}
             <Modal visible={filterModelVisible}>
-                <FilterComponent strings={strings} selectedFilter={selectedFilters} onFilterPress={filterClick} closeFilter={closeFilterModel} />
+                <FilterComponent strings={strings} selectedFilter={selectedFilters} onFilterPress={filterClick} closeFilter={closeFilterModel} clearFilter={clearFilterModel} tags={tagsFilter} colour={colourFilter} sizes={sizesFilter} />
             </Modal>
 
         </OtrixContainer >

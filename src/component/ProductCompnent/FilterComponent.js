@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { GlobalStyles, Colors } from '@helpers'
 import OtrixHeader from '../OtrixComponent/OtrixHeader';
@@ -7,8 +7,6 @@ import Fonts from '@helpers/Fonts';
 import { close, checkaround, checkround2 } from '@common';
 import { _roundDimensions } from '@helpers/util';
 import OtrixDivider from '../OtrixComponent/OtrixDivider';
-import FilterTagsDummy from '../items/FilterTagsDummy'
-import SizeTagDummy from '../items/SizeTagDummy'
 import FilterTags from './FilterTags';
 import SizeTags from './SizeTags';
 import RangeSlider from './RangeSlider';
@@ -35,7 +33,7 @@ function FilterComponent(props) {
                     <View style={[GlobalStyles.headerCenter]}>
                         <Text style={GlobalStyles.headingTxt}>{strings.filter.title}</Text>
                     </View>
-                    <TouchableOpacity style={styles.headerRight} onPress={() => props.closeFilter()} >
+                    <TouchableOpacity style={styles.headerRight} onPress={() => props.clearFilter()} >
                         <Text style={styles.clearTxt}> {strings.filter.clear_all}</Text>
                     </TouchableOpacity>
                 </OtrixHeader>
@@ -51,8 +49,8 @@ function FilterComponent(props) {
                     <OtrixDivider size={'sm'} />
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: wp('1%') }}>
                         {
-                            FilterTagsDummy.map((item, index) =>
-                                <FilterTags tagName={item.name} tagID={item.id} key={item.id} selected={props.selectedFilter} onFilterPress={props.onFilterPress} />
+                            props.tags.map((item, index) =>
+                                <FilterTags tagName={item.name} tagID={item.id} key={item.id} selected={props.selectedFilter['tags']} onFilterPress={props.onFilterPress} />
                             )
                         }
                     </View>
@@ -80,16 +78,11 @@ function FilterComponent(props) {
                     <Text style={styles.titleTxt}>{strings.product_details.color}:</Text>
                     <OtrixDivider size={'sm'} />
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: wp('1%') }}>
-                        <TouchableOpacity style={[styles.colorBox, { backgroundColor: '#7d9128' }]} >
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.colorBox, styles.borderBox, { backgroundColor: Colors().themeColor }]} >
-                            {true && <Image source={checkround2} style={styles.imageView} />}
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.colorBox, { backgroundColor: '#c2da0c' }]} >
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.colorBox, styles.borderBox, { backgroundColor: '#ff1e1a' }]} >
-                            {true && <Image source={checkround2} style={styles.imageView} />}
-                        </TouchableOpacity>
+                        {
+                            props.colour.map((item, index) => <TouchableOpacity onPress={() => props.onFilterPress(item.id, 'colour')} style={[styles.colorBox, { backgroundColor: item.name.toLowerCase() }]} key={item.id}>
+                                {props.selectedFilter.colour.includes(item.id) && <Image source={checkround2} style={styles.imageView} />}
+                            </TouchableOpacity>)
+                        }
                     </View>
 
                     <OtrixDivider size={'lg'} />
@@ -97,8 +90,8 @@ function FilterComponent(props) {
                     <OtrixDivider size={'sm'} />
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: wp('1%') }}>
                         {
-                            SizeTagDummy.map((item, index) =>
-                                <SizeTags tagName={item.name} tagID={item.id} key={item.id} selected={props.selectedFilter} onFilterPress={props.onFilterPress} />
+                            props.sizes.map((item, index) =>
+                                <SizeTags tagName={item.name} tagID={item.id} key={item.id} selected={props.selectedFilter.sizes} onFilterPress={props.onFilterPress} />
                             )
                         }
                     </View>

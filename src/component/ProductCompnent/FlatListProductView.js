@@ -13,7 +13,7 @@ function ListProductView(props) {
         <TouchableOpacity style={styles.productBox} onPress={() => props.navToDetail(data)}>
 
             <View style={[styles.imageView, { backgroundColor: props.imageViewBg ? props.imageViewBg : Colors().light_white }]}>
-                <Image source={data.image} style={styles.image}
+                <Image source={{ uri: data.image }} style={styles.image}
                 ></Image>
             </View>
             <View style={styles.infromationView}>
