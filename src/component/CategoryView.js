@@ -32,7 +32,7 @@ function CategoryView(props) {
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(contact, index) => String(index)}
                 renderItem={({ item, index }) =>
-                    <TouchableOpacity key={index} style={styles.categoryBox} onPress={() => props.navigation.navigate('ProductListScreen', { title: item.name })}>
+                    <TouchableOpacity key={index} style={styles.categoryBox} onPress={() => props.navigation.navigate('ProductListScreen', { title: "Categories", id: item.id })}>
                         <View style={styles.imageView}>
                             <Image source={{ uri: item.image }} style={styles.image}
                             ></Image>
