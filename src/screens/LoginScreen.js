@@ -312,7 +312,7 @@ function LoginScreen(props) {
                             textAlign: 'left',
                             marginTop: hp('0.1%'),
                             lineHeight: hp('4%')
-                        }}>Welcome Back to OtrixCommerce </Text>
+                        }}>Welcome Back to Cmc ecommerce </Text>
 
                     </View>
                 }
