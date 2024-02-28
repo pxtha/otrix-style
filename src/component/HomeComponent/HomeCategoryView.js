@@ -35,7 +35,7 @@ function HomeCategoryView(props) {
                 onEndReachedThreshold={0.7}
                 keyExtractor={(contact, index) => String(index)}
                 renderItem={({ item, index }) =>
-                    <TouchableOpacity style={styles.catBox} key={item.id} onPress={() => props.navigation.navigate('ProductListScreen', { title: item.name })}>
+                    <TouchableOpacity style={styles.catBox} key={item.id} onPress={() => props.navigation.navigate('ProductListScreen', { title: "Categories", id: item.id })}>
                         <View style={styles.imageContainer}>
                             <Image source={{ uri: item.image }} style={styles.imageView}
                             ></Image>
