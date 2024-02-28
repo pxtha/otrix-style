@@ -26,7 +26,7 @@ function CheckoutScreen(props) {
     const applyCouponCode = () => {
         const { couponCode } = state;
         if (couponCode != null) {
-            if (couponCode == 'otrixweb') {
+            if (couponCode == 'cmc ecommerce') {
                 setState({ ...state, isApplied: true, validCode: true })
             }
             else {
@@ -127,7 +127,7 @@ function CheckoutScreen(props) {
             </OtrixContent>
             {!noRecord && !loading && <View style={styles.checkoutView}>
                 <View style={styles.couponInput}>
-                    <Input variant="outline" placeholder="Coupon Code (use otrixweb)" style={[GlobalStyles.textInputStyle, styles.inputStyle]}
+                    <Input variant="outline" placeholder="Coupon Code (use cmc ecommerce)" style={[GlobalStyles.textInputStyle, styles.inputStyle]}
                         onChangeText={(couponCode) => setState({ ...state, couponCode })}
                         InputRightElement={
                             <View style={{ flexDirection: 'row', marginRight: wp('3%'), justifyContent: 'center', alignItems: 'center' }}>

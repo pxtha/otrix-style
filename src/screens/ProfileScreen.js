@@ -125,8 +125,8 @@ function ProfileScreen(props) {
 
                 </TouchableOpacity>
                 <OtrixDivider size={'sm'} />
-                <Text style={styles.username}>Otrixweb User</Text>
-                <Text style={styles.email}>otrixweb@mail.com</Text>
+                <Text style={styles.username}>Cmc ecommerce User</Text>
+                <Text style={styles.email}>cmcecommerce@mail.com</Text>
 
             </View>
 
