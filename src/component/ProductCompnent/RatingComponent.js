@@ -11,17 +11,15 @@ function RatingComponent(props) {
 
     let productDetail = props.productData;
     const { strings } = props;
-
-    console.log(productDetail)
     return (
         <>
 
             <OtrixDivider size={'md'} />
             <Text style={styles.overallTxt}>{strings.product_details.overall_rating}</Text>
             <OtrixDivider size={'sm'} />
-            <Text style={styles.avgtxt}>{productDetail.rating}</Text>
+            <Text style={styles.avgtxt}>{productDetail?.rating ?? 0}</Text>
             <OtrixDivider size={'sm'} />
-            <Stars
+            {/* <Stars
                 default={productDetail.rating}
                 count={5}
                 half={true}
@@ -30,7 +28,7 @@ function RatingComponent(props) {
                 emptyStar={<FontAwesomeIcon name={'star-o'} size={wp('3.5%')} style={[styles.myStarStyle, styles.myEmptyStarStyle]} />}
                 halfStar={<FontAwesomeIcon name={'star-half-empty'} size={wp('3.5%')} style={[styles.myStarStyle]} />}
                 disabled={true}
-            />
+            /> */}
             <Text style={[styles.reviewTxt, { fontSize: wp('3%'), lineHeight: hp('2.8%') }]}>{strings.product_details.based_on} {productDetail.reviewCount} {strings.product_details.review}</Text>
             <OtrixDivider size={'sm'} />
             <View style={styles.ratingLine}>
