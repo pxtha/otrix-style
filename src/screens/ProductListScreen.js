@@ -22,8 +22,8 @@ import { _addToWishlist, _getWishlist, logfunction } from "@helpers/FunctionHelp
 import { ProductListSkeleton } from '@skeleton';
 import { GET_PRODUCTS, GET_FILTERS } from '@apis/queries';
 import { useLazyQuery, useQuery } from '@apollo/client';
-import { filterMapping } from "../component/items/FilterMapping";
-import { ProductsMapping } from "../component/items/ProductsMapping";
+import { filterMapping } from "@component/items/FilterMapping";
+import { ProductsMapping } from "@component/items/ProductsMapping";
 
 function ProductListScreen(props) {
     const [state, setState] = React.useState({
@@ -108,7 +108,6 @@ function ProductListScreen(props) {
     const { wishlistData, strings } = props;
 
     useEffect(() => {
-        console.log(selectedFilters.tags)
         getProducts({
             variables: {
                 color: selectedFilters.colour ? selectedFilters.colour : [],

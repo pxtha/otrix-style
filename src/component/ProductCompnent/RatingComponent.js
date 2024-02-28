@@ -12,13 +12,14 @@ function RatingComponent(props) {
     let productDetail = props.productData;
     const { strings } = props;
 
+    console.log(productDetail)
     return (
         <>
 
             <OtrixDivider size={'md'} />
             <Text style={styles.overallTxt}>{strings.product_details.overall_rating}</Text>
             <OtrixDivider size={'sm'} />
-            <Text style={styles.avgtxt}>4.7</Text>
+            <Text style={styles.avgtxt}>{productDetail.rating}</Text>
             <OtrixDivider size={'sm'} />
             <Stars
                 default={productDetail.rating}

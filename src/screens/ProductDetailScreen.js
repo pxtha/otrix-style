@@ -1,5 +1,5 @@
 import { addToCart } from '@actions';
-import { GET_PRODUCT } from "@apis/queries";
+import { GET_PRODUCT, GET_FILTERS } from "@apis/queries";
 import { useQuery } from '@apollo/client';
 import { bottomCart, checkround2, close } from '@common';
 import {
@@ -25,20 +25,22 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIconsIcon from 'react-native-vector-icons/MaterialIcons';
 import { connect } from 'react-redux';
-import { ProductMapping } from "../component/items/ProductsMapping";
-import { SimilarProductsMapping } from "../component/items/SimilarProductsMapping";
-import Fonts from "../helpers/Fonts";
+import { ProductMapping } from "@component/items/ProductsMapping";
+import { SimilarProductsMapping } from "@component/items/SimilarProductsMapping";
+import Fonts from "@helpers/Fonts";
+import { filterMapping } from "@component/items/FilterMapping";
+import { reviewMapping } from '../component/items/ReviewMapping';
 
 const COLORS = ['#3ad35c', Colors().themeColor, '#efcd19', '#ff1e1a'];
 
 function ProductDetailScreen(props) {
     const { id } = useRoute().params;
-    const [state, setState] = React.useState({ loading: true, productCount: 1, cartCountState: props?.cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
-    const { loading, selectedColor, productCount, zoomImages, cartCountState, showZoom, fetchCart } = state;
+    const [state, setState] = React.useState({ productCount: 1, cartCountState: props?.cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
+    const { selectedColor, productCount, zoomImages, cartCountState, showZoom, fetchCart } = state;
     const [msg, setMsg] = React.useState({ message: null, type: null })
     const { message, type } = msg;
 
-    const { data } = useQuery(GET_PRODUCT, { variables: { slug: parseInt(id) } });
+    const { data, loading } = useQuery(GET_PRODUCT, { variables: { slug: parseInt(id) } });
     const productDetail = useMemo(() => {
         if (!data || !data.productOne.single) return {};
         return ProductMapping(data.productOne.single.data)
@@ -47,6 +49,20 @@ function ProductDetailScreen(props) {
     const similarProduct = useMemo(() => {
         if (!data || !data.productOne.related) return [];
         return SimilarProductsMapping(data.productOne.related)
+    }, [data])
+
+    const colourFilter = useMemo(() => {
+        if (data && data.productOne.single.data.attributes.product_variants) {
+            return filterMapping(data.productOne.single.data.attributes.product_variants.data, 'color')
+        }
+        return [];
+    }, [data])
+
+    const reviews = useMemo(() => {
+        if (data && data.productOne.single.data.attributes.reviews) {
+            return reviewMapping(data.productOne.single.data.attributes.reviews.data)
+        }
+        return {}
     }, [data])
 
     const _CartData = () => {
@@ -87,15 +103,13 @@ function ProductDetailScreen(props) {
         //     })
         // });
 
-        let loadPage = setTimeout(() => setState({ ...state, loading: false, productDetail: productDetail, zoomImages }), 100);
+        let loadPage = setTimeout(() => setState({ ...state, productDetail: productDetail, zoomImages }), 100);
 
         return () => {
             clearTimeout(loadPage);
         };
     }, [cartCountState < cartCount && _CartData()]);
 
-
-    console.log(data, productDetail)
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
@@ -163,8 +177,8 @@ function ProductDetailScreen(props) {
                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: wp('1%') }}>
 
                                         {
-                                            COLORS.map((item, index) =>
-                                                <TouchableOpacity key={index.toString()} style={[styles.box, { backgroundColor: item }]} onPress={() => setState({ ...state, selectedColor: index })}>
+                                            colourFilter.map((item, index) =>
+                                                <TouchableOpacity key={index.toString()} style={[styles.box, { backgroundColor: item.name.toLowerCase() }]} onPress={() => setState({ ...state, selectedColor: index })}>
                                                     {index == selectedColor && <Image source={checkround2} style={styles.colorimageView} />}
                                                 </TouchableOpacity>
                                             )
@@ -207,7 +221,7 @@ function ProductDetailScreen(props) {
                                 <Text style={styles.productPrice}>{productDetail.price}</Text>
                                 <View style={styles.starView}>
                                     <Stars
-                                        default={productDetail.rating}
+                                        default={reviews.rating}
                                         count={5}
                                         half={true}
                                         starSize={45}
@@ -216,7 +230,7 @@ function ProductDetailScreen(props) {
                                         halfStar={<FontAwesomeIcon name={'star-half-empty'} size={wp('3.5%')} style={[styles.myStarStyle]} />}
                                         disabled={true}
                                     />
-                                    <Text style={styles.reviewTxt}>({productDetail?.reviewCount ?? 0} {strings.product_details.review})</Text>
+                                    <Text style={styles.reviewTxt}>({reviews.data.length} {strings.product_details.review})</Text>
                                 </View>
                             </View>
                             <OtrixDivider size={'lg'} />
@@ -237,7 +251,7 @@ function ProductDetailScreen(props) {
 
 
                             {/* Rating Container*/}
-                            <RatingComponent strings={strings} productData={productDetail} />
+                            <RatingComponent strings={strings} productData={reviews} />
 
                             {/* Similar Product Component */}
                             <SimilarProduct strings={strings} navigation={props.navigation} similarProduct={similarProduct} />
@@ -342,7 +356,7 @@ const styles = StyleSheet.create({
         flex: 0.75,
         alignItems: 'flex-start',
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center'
     },
     containerTxt: {
