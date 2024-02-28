@@ -28,7 +28,7 @@ import Share from 'react-native-share';
 // import RNRestart from 'react-native-restart';
 import { useEffect } from "react";
 const shareOptions = {
-    title: 'Otrixapp',
+    title: 'Cmcecommerce',
     url: Platform.OS == 'android' ? 'https://play.google.com/store/apps/details?id=com.otrixcommerce' : 'iOS url',
 };
 
@@ -202,7 +202,7 @@ function SettingScreen(props) {
             </OtrixContent>
 
             {/* <Text style={styles.bottomTxt}>Otrixapp</Text> */}
-            <Image source={logo} style={styles.bottomlogo} />
+            {/* <Image source={logo} style={styles.bottomlogo} /> */}
             <Text style={styles.bottomVersion}>Version: 1.3</Text>
             <OtrixDivider size={'lg'} />
         </OtrixContainer >

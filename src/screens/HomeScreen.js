@@ -84,7 +84,7 @@ function HomeScreen(props) {
                     }
                 </TouchableOpacity>
                 <View style={styles.headerCenter}>
-                    <Text style={styles.headingTxt}>Otrixweb</Text>
+                    <Text style={styles.headingTxt}>CMC ECOMMERCE</Text>
                 </View>
                 {/* <Image
                     ml="3"

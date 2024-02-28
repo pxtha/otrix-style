@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Fonts from "../helpers/Fonts";
 
 function EditProfileScreen(props) {
-    const [state, setData] = React.useState({ first_name: 'Otrixweb', last_name: "User", email: "otrixweb@mail.com", phone: "9898989898", submited: false });
+    const [state, setData] = React.useState({ first_name: 'Cmc ecommerce', last_name: "User", email: "cmcecommerce@mail.com", phone: "9898989898", submited: false });
 
     const { first_name, last_name, email, phone, submited } = state;
     const { strings } = props;
