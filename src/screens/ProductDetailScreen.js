@@ -31,8 +31,6 @@ import Fonts from "@helpers/Fonts";
 import { filterMapping } from "@component/items/FilterMapping";
 import { reviewMapping } from '../component/items/ReviewMapping';
 
-const COLORS = ['#3ad35c', Colors().themeColor, '#efcd19', '#ff1e1a'];
-
 function ProductDetailScreen(props) {
     const { id } = useRoute().params;
     const [state, setState] = React.useState({ productCount: 1, cartCountState: props?.cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
@@ -54,6 +52,13 @@ function ProductDetailScreen(props) {
     const colourFilter = useMemo(() => {
         if (data && data.productOne.single.data.attributes.product_variants) {
             return filterMapping(data.productOne.single.data.attributes.product_variants.data, 'color')
+        }
+        return [];
+    }, [data])
+
+    const sizeFilter = useMemo(() => {
+        if (data && data.productOne.single.data.attributes.product_variants) {
+            return filterMapping(data.productOne.single.data.attributes.product_variants.data[0]?.attributes?.sizes?.data, 'name')
         }
         return [];
     }, [data])
@@ -89,26 +94,26 @@ function ProductDetailScreen(props) {
     }
     const { cartCount, strings } = props;
 
-    useEffect(() => {
-        // let findProduct = productDetail.filter(p => p.id == id);
+    // useEffect(() => {
+    //     // let findProduct = productDetail.filter(p => p.id == id);
 
-        //zoom images
-        let zoomImages = [];
-        // productDetail.images.length > 0 && productDetail.images.forEach(function (item) {
-        //     zoomImages.push({
-        //         url: item,
-        //         props: {
-        //             source: item
-        //         }
-        //     })
-        // });
+    //     //zoom images
+    //     let zoomImages = [];
+    //     // productDetail.images.length > 0 && productDetail.images.forEach(function (item) {
+    //     //     zoomImages.push({
+    //     //         url: item,
+    //     //         props: {
+    //     //             source: item
+    //     //         }
+    //     //     })
+    //     // });
 
-        let loadPage = setTimeout(() => setState({ ...state, productDetail: productDetail, zoomImages }), 100);
+    //     let loadPage = setTimeout(() => setState({ ...state, productDetail: productDetail, zoomImages }), 100);
 
-        return () => {
-            clearTimeout(loadPage);
-        };
-    }, [cartCountState < cartCount && _CartData()]);
+    //     return () => {
+    //         clearTimeout(loadPage);
+    //     };
+    // }, [cartCountState < cartCount && _CartData()]);
 
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
@@ -172,7 +177,7 @@ function ProductDetailScreen(props) {
                             {/* Color And Heart Icon */}
                             <View style={styles.colorView}>
                                 {/* Color */}
-                                <View style={styles.colorContainer}>
+                                {colourFilter.length > 0 ? <View style={styles.colorContainer}>
                                     <Text style={styles.containerTxt}>{strings.product_details.color}:</Text>
                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: wp('1%') }}>
 
@@ -189,7 +194,7 @@ function ProductDetailScreen(props) {
                                         </TouchableOpacity>
 
                                     </View>
-                                </View>
+                                </View> : <View style={styles.colorContainer}></View>}
 
                                 {/* Heart Icon */}
                                 {/* TODO: Need to handle */}
@@ -220,8 +225,8 @@ function ProductDetailScreen(props) {
                             <View style={styles.subContainer}>
                                 <Text style={styles.productPrice}>{productDetail.price}</Text>
                                 <View style={styles.starView}>
-                                    <Stars
-                                        default={reviews.rating}
+                                    {/* <Stars
+                                        default={reviews.rating ?? 0}
                                         count={5}
                                         half={true}
                                         starSize={45}
@@ -229,8 +234,8 @@ function ProductDetailScreen(props) {
                                         emptyStar={<FontAwesomeIcon name={'star-o'} size={wp('3.5%')} style={[styles.myStarStyle, styles.myEmptyStarStyle]} />}
                                         halfStar={<FontAwesomeIcon name={'star-half-empty'} size={wp('3.5%')} style={[styles.myStarStyle]} />}
                                         disabled={true}
-                                    />
-                                    <Text style={styles.reviewTxt}>({reviews.data.length} {strings.product_details.review})</Text>
+                                    /> */}
+                                    <Text style={styles.reviewTxt}>({reviews?.data?.length ?? 0} {strings.product_details.review})</Text>
                                 </View>
                             </View>
                             <OtrixDivider size={'lg'} />
@@ -238,7 +243,7 @@ function ProductDetailScreen(props) {
                             <OtrixDivider size={'md'} />
 
                             {/* Sizes Container*/}
-                            {/* <SizeContainerComponent productData={productDetail} /> */}
+                            <SizeContainerComponent productData={sizeFilter} />
 
                             <OtrixDivider size={'md'} />
 
@@ -391,7 +396,7 @@ const styles = StyleSheet.create({
     },
     heartIconView: {
         flex: 0.25,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
     },
     headingTxt: {
