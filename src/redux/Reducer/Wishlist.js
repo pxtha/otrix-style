@@ -3,6 +3,7 @@ import { logfunction } from "../../helpers/FunctionHelper";
 
 const initialState = {
     wishlistCount: 0,
+    wishlistData: []
 }
 export default (state = initialState, action) => {
     const { payload } = action;

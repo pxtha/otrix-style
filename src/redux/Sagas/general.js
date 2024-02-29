@@ -74,6 +74,7 @@ function* requestInit(action) {
         let getLocalWishlist = yield call(AsyncStorage.getItem, "GET_LOCAL_WISHLIST");
         logfunction("LOCAL Wishlist  ", JSON.parse(getLocalWishlist));
         getLocalWishlist = JSON.parse(getLocalWishlist);
+        console.log("getLocalWishlist::", getLocalWishlist)
         if (getLocalWishlist) {
             yield put(successWishlist(getLocalWishlist));
         }

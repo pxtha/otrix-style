@@ -23,14 +23,14 @@ function WishlistComponent(props) {
                     <View style={styles.cartContent} key={item.id.toString()}>
                         <View style={styles.cartBox} >
                             <View style={styles.imageView}>
-                                <Image source={item.image} style={styles.image}
+                                <Image source={{ uri: item?.image }} style={styles.image}
                                 ></Image>
                             </View>
                             <View style={styles.infromationView}>
                                 <TouchableOpacity onPress={() => props.navigation.navigate('ProductDetailScreen', { id: item.id })}>
                                     <Text style={styles.name}>{item.name}</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.price}>{PriceQuantity(item.price, item.quantity)}</Text>
+                                <Text style={styles.price}>{PriceQuantity(item.price + "$", item.quantity)}</Text>
                                 <View style={styles.plusminus}>
                                     <Text style={styles.quantityTxt}>{item.quantity}</Text>
                                 </View>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        height: hp('12%'),
+        height: hp('15%'),
         flex: 0.90,
     },
     imageView: {
@@ -78,15 +78,14 @@ const styles = StyleSheet.create({
     image: {
         resizeMode: 'contain',
         alignSelf: 'center',
-        height: undefined,
+        height: hp("10%"),
         aspectRatio: 1,
         width: wp('21.5%')
     },
     infromationView: {
         flex: 0.70,
-        marginBottom: hp('1.4%'),
         marginLeft: wp('5%'),
-        marginTop: hp('1%'),
+        marginTop: hp('5%'),
         justifyContent: 'center',
         alignItems: 'flex-start'
     },

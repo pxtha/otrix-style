@@ -15,11 +15,11 @@ import {
 import { bannerMapping } from "@component/items/BannerMapping.js";
 import { Colors, GlobalStyles } from '@helpers';
 import Fonts from "@helpers/Fonts";
-import { _addToWishlist } from "@helpers/FunctionHelper";
+import { _addToWishlist, _getWishlist } from "@helpers/FunctionHelper";
 import { _roundDimensions } from '@helpers/util';
 import { HomeSkeleton } from '@skeleton';
 import { Badge } from "native-base";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Image,
     StyleSheet,
@@ -31,12 +31,11 @@ import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-nat
 import { connect } from 'react-redux';
 
 function HomeScreen(props) {
-    const { data } = useQuery(GET_HOME_DATA);
-
+    const { data, loading } = useQuery(GET_HOME_DATA);
     const { deal, new_arrival, trending, banner } = data?.home?.data?.attributes || {}
-    const [state, setState] = React.useState({ notificationCount: 9, loading: true });
-    const { loading } = state;
-    const { authStatus, wishlistData, strings, wishlistCount } = props;
+
+
+    const { authStatus, strings, wishlistData, wishlistCount } = props;
     const offerBanner = bannerMapping(banner).filter(v => v !== null);
     const [bannerTop = {}, bannerMid = {}, bannerBot = {}] = offerBanner;
 
@@ -46,11 +45,11 @@ function HomeScreen(props) {
     }
 
     useEffect(() => {
-        let loadHomePage = setTimeout(() => setState({ ...state, loading: false }), 300);
-        return () => {
-            clearTimeout(loadHomePage);
-        };
-    }, []);
+        (async function () {
+            const wishlistData = await _getWishlist();
+            props.addToWishList(wishlistData);
+        })();
+    }, [])
 
     return (
 
