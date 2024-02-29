@@ -5,11 +5,18 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Fonts from '@helpers/Fonts';
 import Stars from 'react-native-stars';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import { addToWishList } from '@actions';
+import { _addToWishlist } from "@helpers/FunctionHelper";
+import { connect } from 'react-redux';
 
 function ProductView(props) {
     const data = props.data;
-    const wishlistArr = props.wishlistArray ? props.wishlistArray : null;
+    const wishlistArr = props.wishlistData ? props.wishlistData : null;
+
+    const addToWish = async (id) => {
+        let wishlistData = await _addToWishlist(id);
+        props.addToWishList(wishlistData);
+    }
 
     return (
         <TouchableOpacity style={styles.productBox} onPress={() => props.navToDetail(data)}>
@@ -49,9 +56,9 @@ function ProductView(props) {
                 </View>
             }
             {
-                wishlistArr && wishlistArr.length > 0 && wishlistArr.includes(data.id) ? <TouchableOpacity style={GlobalStyles.FavCircle} onPress={() => props.addToWishlist(data.id)} >
+                wishlistArr && wishlistArr.length > 0 && wishlistArr.includes(data.id) ? <TouchableOpacity style={GlobalStyles.FavCircle} onPress={() => addToWish(data.id)} >
                     <Icon name="heart" style={GlobalStyles.unFavIcon} color={Colors().white} />
-                </TouchableOpacity> : <TouchableOpacity style={GlobalStyles.unFavCircle} onPress={() => props.addToWishlist(data.id)}>
+                </TouchableOpacity> : <TouchableOpacity style={GlobalStyles.unFavCircle} onPress={() => addToWish(data.id)}>
                     <Icon name="heart-o" style={GlobalStyles.unFavIcon} color={Colors().secondry_text_color} />
                 </TouchableOpacity>
             }
@@ -61,7 +68,14 @@ function ProductView(props) {
     )
 }
 
-export default ProductView;
+function mapStateToProps(state) {
+    return {
+        strings: state.mainScreenInit.strings,
+        wishlistData: state.wishlist.wishlistData,
+    }
+}
+
+export default connect(mapStateToProps, { addToWishList })(ProductView);
 
 const styles = StyleSheet.create({
     productBox: {

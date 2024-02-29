@@ -1,4 +1,4 @@
-import { addToCart } from '@actions';
+import { addToCart, addToWishList } from '@actions';
 import { GET_PRODUCT, GET_FILTERS } from "@apis/queries";
 import { useQuery } from '@apollo/client';
 import { bottomCart, checkround2, close } from '@common';
@@ -30,8 +30,12 @@ import { SimilarProductsMapping } from "@component/items/SimilarProductsMapping"
 import Fonts from "@helpers/Fonts";
 import { filterMapping } from "@component/items/FilterMapping";
 import { reviewMapping } from '../component/items/ReviewMapping';
+import { _addToWishlist, _getWishlist } from "@helpers/FunctionHelper";
 
 function ProductDetailScreen(props) {
+    const { cartCount, strings, wishlistData } = props;
+
+    console.log("props::", wishlistData)
     const { id } = useRoute().params;
     const [state, setState] = React.useState({ productCount: 1, cartCountState: props?.cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
     const { selectedColor, productCount, zoomImages, cartCountState, showZoom, fetchCart } = state;
@@ -92,8 +96,12 @@ function ProductDetailScreen(props) {
         setState({ ...state, fetchCart: true })
         props.addToCart(productDetail.id, parseInt(productCount))
     }
-    const { cartCount, strings } = props;
 
+    const _addToFav = async () => {
+        console.log("CLiCK")
+        let wishlistData = await _addToWishlist(id);
+        props.addToWishList(wishlistData)
+    }
     // useEffect(() => {
     //     // let findProduct = productDetail.filter(p => p.id == id);
 
@@ -165,7 +173,6 @@ function ProductDetailScreen(props) {
                                     <Text style={[GlobalStyles.badgeText, { color: Colors().themeColor, fontSize: cartCount > 9 ? wp('2.5%') : wp('3%'), }]}>{cartCount}</Text>
                                 </Badge>
                             }
-
                         </TouchableOpacity>
                     </View>
 
@@ -197,12 +204,11 @@ function ProductDetailScreen(props) {
                                 </View> : <View style={styles.colorContainer}></View>}
 
                                 {/* Heart Icon */}
-                                {/* TODO: Need to handle */}
                                 <View style={styles.heartIconView}>
                                     {
-                                        productDetail.isFav ? <TouchableOpacity style={[GlobalStyles.FavCircle, { left: wp('12%'), top: 0 }]} >
+                                        wishlistData && wishlistData.length > 0 && wishlistData.includes(productDetail.id) ? <TouchableOpacity onPress={() => _addToFav(productDetail.id)} style={[GlobalStyles.FavCircle, { left: wp('12%'), top: 0 }]} >
                                             <FontAwesomeIcon name="heart" style={GlobalStyles.FavIcon} color={Colors().white} />
-                                        </TouchableOpacity> : <TouchableOpacity style={[GlobalStyles.unFavCircle, { left: wp('12%'), top: 0 }]} >
+                                        </TouchableOpacity> : <TouchableOpacity onPress={() => _addToFav(productDetail.id)} style={[GlobalStyles.unFavCircle, { left: wp('12%'), top: 0 }]} >
                                             <FontAwesomeIcon name="heart-o" style={[GlobalStyles.unFavIcon, { fontSize: wp('3.8%') }]} color={Colors().secondry_text_color} />
                                         </TouchableOpacity>
                                     }
@@ -324,10 +330,11 @@ function mapStateToProps(state) {
     return {
         strings: state.mainScreenInit.strings,
         cartCount: state.cart.cartCount,
+        wishlistData: state.wishlist.wishlistData,
     }
 }
 
-export default connect(mapStateToProps, { addToCart })(ProductDetailScreen);
+export default connect(mapStateToProps, { addToCart, addToWishList })(ProductDetailScreen);
 
 const styles = StyleSheet.create({
     productDetailView: {

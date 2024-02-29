@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
     View,
     TouchableOpacity,
@@ -18,44 +18,33 @@ import Fonts from "@helpers/Fonts";
 import { addToWishList } from '@actions';
 import { _getWishlist, _addToWishlist } from "@helpers/FunctionHelper";
 import ProductListDummy from '@component/items/ProductListDummy';
+import { GET_PRODUCTS, GET_FILTERS } from '@apis/queries';
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { filterMapping } from "@component/items/FilterMapping";
+import { ProductsMapping } from "@component/items/ProductsMapping";
 
 function WishlistScreen(props) {
-    const [state, setState] = React.useState({ loading: true, noRecord: false, wishlistArr: [] });
+    const { strings, wishlistData } = props;
 
-    const wishlistSetData = async () => {
-        let wishlistData = await _getWishlist();
-
-        let noRecord = true;
-        let wishlistItems = [];
-        if (wishlistData && wishlistData.length > 0) {
-            //get and create arrayg
-            wishlistData.forEach(function (item, index) {
-                let findedProduct = ProductListDummy.filter(product => product.id == item);
-                wishlistItems.push({
-                    name: findedProduct[0].name,
-                    price: findedProduct[0].price,
-                    image: findedProduct[0].image,
-                    id: findedProduct[0].id
-                });
-            });
-            noRecord = false;
+    const { data: productList, loading } = useQuery(GET_PRODUCTS, {
+        variables: {
+            page: 1,
+            perPage: 100,
         }
+    });
 
-        setState({ ...state, loading: false, noRecord: noRecord, wishlistArr: wishlistItems })
-    }
+    const wishlistArr = useMemo(() => {
+        if (!productList || !wishlistData) return []
+        return wishlistData.map((item) => {
+            const findedProduct = ProductsMapping(productList).find(product => product.id === item)
+            return findedProduct
+        })
+    }, [productList, wishlistData])
 
     const onDeleteItem = async (id) => {
         let wishlistData = await _addToWishlist(id);
         props.addToWishList(wishlistData);
-        wishlistSetData()
     }
-
-    useEffect(() => {
-        wishlistSetData()
-    }, []);
-
-    const { wishlistArr, loading, noRecord } = state;
-    const { strings } = props;
 
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
@@ -76,12 +65,11 @@ function WishlistScreen(props) {
                                     // <CartView navigation={props.navigation} products={cartProducts} deleteItem={onDeleteItem} decrementItem={decrement} incrementItem={increment} />
 
                 */}
+
+                <WishlistComponent navigation={props.navigation} products={wishlistArr} deleteItem={onDeleteItem} />
+
                 {
-                    !noRecord && !loading &&
-                    <WishlistComponent navigation={props.navigation} products={wishlistArr} deleteItem={onDeleteItem} />
-                }
-                {
-                    !loading && noRecord && <View style={styles.noRecord}>
+                    !loading && !wishlistArr.length && <View style={styles.noRecord}>
                         <Text style={styles.emptyTxt}>Wishlist is empty!</Text>
                         <Button
                             size="lg"
@@ -104,6 +92,7 @@ function WishlistScreen(props) {
 function mapStateToProps(state) {
     return {
         cartData: state.cart.cartData,
+        wishlistData: state.wishlist.wishlistData,
         strings: state.mainScreenInit.strings,
 
     }
