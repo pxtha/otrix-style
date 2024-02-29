@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { View, StyleSheet, Text, FlatList } from 'react-native';
 import { GlobalStyles, Colors } from '@helpers'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -11,6 +11,15 @@ function RatingComponent(props) {
 
     let productDetail = props.productData;
     const { strings } = props;
+
+    const calculateRating = (key) => {
+        if (!Object.keys(productDetail).length) return "0%"
+        if (productDetail.groupBy.hasOwnProperty(key)) {
+            return (productDetail.groupBy[key].length / productDetail.data.length) * 100 + "%"
+        }
+        return "0%"
+    }
+
     return (
         <>
 
@@ -36,7 +45,7 @@ function RatingComponent(props) {
                 <View style={styles.line}>
                     <View style={{
                         backgroundColor: '#3ad35c',
-                        width: wp('60%'),
+                        width: wp(calculateRating(5)),
                         flex: 1,
                         borderRadius: 25
                     }}>
@@ -49,7 +58,7 @@ function RatingComponent(props) {
                 <View style={styles.line}>
                     <View style={{
                         backgroundColor: '#efcd19',
-                        width: wp('45%'),
+                        width: wp(calculateRating(4)),
                         flex: 1,
                         borderRadius: 25
                     }}>
@@ -63,7 +72,7 @@ function RatingComponent(props) {
                 <View style={styles.line}>
                     <View style={{
                         backgroundColor: '#ffce1f',
-                        width: wp('40%'),
+                        width: wp(calculateRating(3)),
                         flex: 1,
                         borderRadius: 25
                     }}>
@@ -77,7 +86,7 @@ function RatingComponent(props) {
                 <View style={styles.line}>
                     <View style={{
                         backgroundColor: '#e9961a',
-                        width: wp('25%'),
+                        width: wp(calculateRating(2)),
                         flex: 1,
                         borderRadius: 25
                     }}>
@@ -91,7 +100,7 @@ function RatingComponent(props) {
                 <View style={styles.line}>
                     <View style={{
                         backgroundColor: '#e83328',
-                        width: wp('8%'),
+                        width: wp(calculateRating(1)),
                         flex: 1,
                         borderRadius: 25
                     }}>
@@ -106,7 +115,7 @@ function RatingComponent(props) {
     )
 }
 
-export default RatingComponent;
+export default (RatingComponent);
 
 const styles = StyleSheet.create({
     overallTxt: {
