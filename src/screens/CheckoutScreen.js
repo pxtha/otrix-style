@@ -1,116 +1,49 @@
-import React, { useEffect } from "react";
-import {
-    View,
-    TouchableOpacity,
-    Text,
-    StyleSheet, ScrollView,
-    Modal
-} from "react-native";
-import { connect } from 'react-redux';
-import { Button, FormControl, Input } from 'native-base';
-import {
-    OtrixContainer, OtrixHeader, OtrixContent, OtrixDivider, CheckoutView, OtirxBackButton, AddAdressComponent, EditAddressComponent, PaymentSuccessComponent
-} from '@component';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { GlobalStyles, Colors } from '@helpers';
-import { _roundDimensions } from '@helpers/util';
 import { proceedCheckout } from '@actions';
-import ProductListDummy from '@component/items/ProductListDummy';
+import {
+    CheckoutView,
+    OtirxBackButton,
+    OtrixContainer,
+    OtrixContent, OtrixDivider,
+    OtrixHeader,
+    PaymentSuccessComponent
+} from '@component';
 import PaymentMethodsDummy from '@component/items/PaymentMethodsDummy';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MatIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Colors, GlobalStyles } from '@helpers';
 import Fonts from "@helpers/Fonts";
-import DummyAddress from '@component/items/DummyAddress';
+import { useRoute } from '@react-navigation/native';
+import { Button, FormControl, Input } from 'native-base';
+import React from "react";
+import {
+    Modal,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 
 function CheckoutScreen(props) {
-    const [state, setState] = React.useState({ loading: true, comment: null, cartArr: [], showAdd: false, cartProducts: [], sumAmount: 0, noRecord: false, addresses: DummyAddress, selctedAddress: DummyAddress[0].id, showEdit: false, editAddressData: [], step: 1, selectedPaymentMethod: 4, paymentSuccessModal: false });
+    const { strings, checkoutData } = props;
+    const { totalAmt } = useRoute().params;
 
-    const calculateCart = () => {
-        let cartProducts = props.cartData;
-        let cartItems = [];
-        let sumAmount = 0;
-
-        //find and create array
-        cartProducts && cartProducts.length > 0 && cartProducts.forEach(function (item, index) {
-            let findedProduct = ProductListDummy.filter(product => product.id == item.product_id);
-            cartItems.push({
-                quantity: item.quantity,
-                name: findedProduct[0].name,
-                price: findedProduct[0].price,
-                image: findedProduct[0].image,
-                id: findedProduct[0].id
-            });
-            let amt = parseInt(findedProduct[0].price.replace('$', ''));
-            sumAmount += amt * item.quantity;
-        });
-
-        setState({ ...state, noRecord: cartProducts.length > 0 ? false : true, loading: false, cartProducts: cartItems, sumAmount: sumAmount, });
-    }
-
-    const storeAddress = (addressData) => {
-        let newID = "" + Math.floor(Math.random() * 10000) + 1;
-        let newObj = { id: "" + newID, name: addressData.name, country: addressData.country, city: addressData.city, postcode: addressData.postcode, address1: addressData.address1, address2: addressData.address2 };
-        setState({
-            ...state, addresses: [newObj, ...addresses], showAdd: false
-        });
-    }
-
-    const updateAddress = (addressData) => {
-        let newID = "" + Math.floor(Math.random() * 10000) + 1;
-        if (selctedAddress == addressData.id) {
-            setState({ ...state, selctedAddress: newID });
-        }
-        let findIndex = addresses.findIndex((item) => item.id === editAddressData.id);
-        let newObj = { id: newID, name: addressData.name, country: addressData.country, city: addressData.city, postcode: addressData.postcode, address1: addressData.address1, address2: addressData.address2 };
-        addresses.splice(findIndex, 1);
-
-        setState({
-            ...state, addresses: [newObj, ...addresses], showEdit: false
-        });
-        if (selctedAddress == addressData.id) {
-            setState({ ...state, selctedAddress: newID });
-        }
-    }
+    const [state, setState] = React.useState({ step: 1, selectedPaymentMethod: 4, paymentSuccessModal: false, comment });
 
     const closePay = (navigateTo) => {
         setState({
             ...state,
+            step: 1,
             paymentSuccessModal: false
         });
         props.navigation.push(navigateTo);
-    }
-
-    const editAddress = (id) => {
-
-        let findAddress = addresses.filter(item => item.id.indexOf(id) > -1);
-        setState({ ...state, editAddressData: findAddress[0], showEdit: true });
-    }
-
-    const closeAddressModel = () => {
-        setState({
-            ...state,
-            showAdd: false
-        });
-    }
-
-    const closeAddressEditModel = () => {
-        setState({
-            ...state,
-            showEdit: false
-        });
     }
 
     const _proceedCheckout = () => {
         props.proceedCheckout();
     }
 
-    useEffect(() => {
-        calculateCart();
-    }, []);
-
-    const { cartProducts, comment, loading, noRecord, showAdd, addresses, selctedAddress, showEdit, editAddressData, step, selectedPaymentMethod, paymentSuccessModal } = state;
-    const { totalAmt } = props.route.params;
-    const { strings } = props;
+    const { step, selectedPaymentMethod, paymentSuccessModal, comment } = state;
 
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
@@ -133,7 +66,7 @@ function CheckoutScreen(props) {
                         <View style={{ position: 'relative' }}>
                             <View style={[styles.ract, { borderColor: step == 1 ? Colors().themeColor : 'transparent' }]}>
 
-                                <Text style={[styles.indicatorText, { color: step == 1 ? Colors().themeColor : Colors().secondry_text_color }]}>{strings.checkout.address}</Text>
+                                <Text style={[styles.indicatorText, { color: step == 1 ? Colors().themeColor : Colors().secondry_text_color }]}>{strings.checkout.summary}</Text>
                             </View>
                             <View style={[styles.tri]}>
                                 <View style={[styles.arrow, { borderColor: step == 1 ? Colors().themeColor : 'transparent' }]}>
@@ -158,46 +91,6 @@ function CheckoutScreen(props) {
                 </View>
             </View>
 
-            {/* Address Content start from here */}
-            {step == 1 && <>
-                <OtrixDivider size={"md"} />
-                <Text style={styles.deliveryTitle}>{strings.checkout.delivery_address}</Text>
-                <OtrixDivider size={"sm"} />
-                <View style={styles.addressContent}>
-                    {/*horizontal address* */}
-                    <ScrollView style={styles.addressBox} showsHorizontalScrollIndicator={false} horizontal={true}>
-                        {
-                            addresses.length > 0 && addresses.map((item, index) =>
-                                <TouchableOpacity key={index} style={[styles.deliveryBox, {
-                                    borderWidth: selctedAddress == item.id ? 1 : 0.1,
-                                    borderColor: selctedAddress == item.id ? Colors().themeColor : Colors().white
-                                }]}
-                                    onPress={() => setState({ ...state, selctedAddress: item.id })}
-                                >
-                                    <Text style={styles.addressTxt} numberOfLines={1}>{item.name}     </Text>
-                                    <Text style={styles.addressTxt} numberOfLines={2}>{item.address1}    </Text>
-                                    <Text style={styles.addressTxt} numberOfLines={2}>{item.address2}, {item.city}</Text>
-                                    <Text style={styles.addressTxt} numberOfLines={1}>{item.postcode}, {item.country}</Text>
-                                    {selctedAddress == item.id &&
-                                        <Text style={styles.deliveryAddressTxt}>{strings.checkout.delivery_address} <Icon name="md-checkmark-circle-sharp" color={Colors().themeColor} size={wp('4%')} style={{ textAlignVertical: 'center' }} /></Text>
-                                    }
-                                    <TouchableOpacity style={[styles.editView, { bottom: selctedAddress == item.id ? hp('12%') : hp('10%') }]} onPress={() => editAddress(item.id)}>
-                                        <Text style={styles.edit}> <MatIcon name="pencil" color={Colors().text_color} size={wp('5%')} /></Text>
-                                    </TouchableOpacity>
-                                </TouchableOpacity>
-                            )
-                        }
-
-                    </ScrollView>
-
-                    <TouchableOpacity style={styles.plusView} onPress={() => setState({ ...state, showAdd: true })}>
-                        <MatIcon name="plus" color={Colors().text_color} size={wp('5%')} />
-                    </TouchableOpacity>
-                </View>
-            </>
-            }
-
-
             {
                 step == 1 && <OtrixContent>
                     <OtrixDivider size={"lg"} />
@@ -206,24 +99,11 @@ function CheckoutScreen(props) {
                     <View style={GlobalStyles.horizontalLine}></View>
                     <>
                         {
-                            !noRecord && !loading && <CheckoutView strings={strings} navigation={props.navigation} products={cartProducts} />
+                            checkoutData.length && <CheckoutView strings={strings} navigation={props.navigation} products={checkoutData} />
                         }
                     </>
                 </OtrixContent>
             }
-
-            {/* Add Address Screen */}
-            <Modal visible={showAdd}
-                transparent={true}>
-                <AddAdressComponent strings={strings} closeAdd={closeAddressModel} addAdress={storeAddress} />
-            </Modal>
-
-            {/* Edit Address Screen */}
-            <Modal visible={showEdit}
-                transparent={true}>
-                <EditAddressComponent strings={strings} closeEdit={closeAddressEditModel} editAddress={updateAddress} editData={editAddressData} />
-            </Modal>
-
 
             {/******** PAYMENT SECTION *************/}
             {
@@ -304,7 +184,7 @@ function CheckoutScreen(props) {
 
 function mapStateToProps(state) {
     return {
-        cartData: state.cart.cartData,
+        checkoutData: state.checkout.checkoutData,
         strings: state.mainScreenInit.strings,
         USER_AUTH: state.auth.USER_AUTH,
 

@@ -11,6 +11,7 @@ import MatIcon from 'react-native-vector-icons/FontAwesome5';
 function CartView(props) {
     let cartProduct = props.products;
     const PriceQuantity = (price, quantity) => {
+        console.log(quantity)
         let amt = parseFloat(price.replace('$', ''));
         let qty = parseInt(quantity);
         return '$' + amt;
@@ -23,14 +24,14 @@ function CartView(props) {
                     <View style={styles.cartContent} key={item.id}>
                         <View style={styles.cartBox} >
                             <View style={styles.imageView}>
-                                <Image source={item.image} style={styles.image}
+                                <Image source={{ uri: item.image }} style={styles.image}
                                 ></Image>
                             </View>
                             <View style={styles.infromationView}>
                                 <TouchableOpacity style={{ padding: 4 }} onPress={() => props.navigation.navigate('ProductDetailScreen', { id: item.id })}>
-                                    <Text style={styles.name}>{item.name}</Text>
+                                    <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.price}>{PriceQuantity(item.price, item.quantity)}</Text>
+                                <Text style={styles.price}>{PriceQuantity(item.price + "$", item.quantity)}</Text>
                                 <View style={styles.plusminus}>
                                     <TouchableOpacity style={{ marginRight: wp('2.5%'), padding: 4 }} onPress={() => item.quantity != 1 && props.decrementItem(item.id)}>
                                         <Icon name="minus" style={styles.plusminusTxt} />
@@ -92,10 +93,11 @@ const styles = StyleSheet.create({
         width: wp('21.5%')
     },
     infromationView: {
-        flex: 0.70,
+        flex: 0.90,
         marginBottom: hp('1.4%'),
         justifyContent: 'center',
-        alignItems: 'flex-start'
+        alignItems: 'flex-start',
+        flexWrap: "nowrap"
     },
     name: {
         textAlign: 'center',

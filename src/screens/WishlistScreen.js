@@ -1,27 +1,28 @@
-import React, { useEffect, useMemo } from "react";
-import {
-    View,
-    TouchableOpacity,
-    Text,
-    StyleSheet,
-} from "react-native";
-import { connect } from 'react-redux';
-import { Button } from 'native-base';
-import {
-    OtrixContainer, OtrixHeader, OtrixContent, OtirxBackButton, WishlistComponent
-} from '@component';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { GlobalStyles, Colors } from '@helpers';
-import { _roundDimensions } from '@helpers/util';
-import Icon from 'react-native-vector-icons/Ionicons';
-import Fonts from "@helpers/Fonts";
 import { addToWishList } from '@actions';
-import { _getWishlist, _addToWishlist } from "@helpers/FunctionHelper";
-import ProductListDummy from '@component/items/ProductListDummy';
-import { GET_PRODUCTS, GET_FILTERS } from '@apis/queries';
-import { useLazyQuery, useQuery } from '@apollo/client';
-import { filterMapping } from "@component/items/FilterMapping";
+import { GET_PRODUCTS } from '@apis/queries';
+import { useQuery } from '@apollo/client';
+import {
+    OtirxBackButton,
+    OtrixContainer,
+    OtrixContent,
+    OtrixHeader,
+    WishlistComponent
+} from '@component';
 import { ProductsMapping } from "@component/items/ProductsMapping";
+import { Colors, GlobalStyles } from '@helpers';
+import Fonts from "@helpers/Fonts";
+import { _addToWishlist } from "@helpers/FunctionHelper";
+import { Button } from 'native-base';
+import React, { useMemo } from "react";
+import {
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 
 function WishlistScreen(props) {
     const { strings, wishlistData } = props;
@@ -61,11 +62,6 @@ function WishlistScreen(props) {
 
             {/* Content Start from here */}
             <OtrixContent >
-                {/* Cart Component Start from here
-                                    // <CartView navigation={props.navigation} products={cartProducts} deleteItem={onDeleteItem} decrementItem={decrement} incrementItem={increment} />
-
-                */}
-
                 <WishlistComponent navigation={props.navigation} products={wishlistArr} deleteItem={onDeleteItem} />
 
                 {

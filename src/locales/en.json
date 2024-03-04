@@ -199,7 +199,7 @@
     "seach_product": "Search Product"
   },
   "checkout": {
-    "address": "Address",
+    "summary": "Summary",
     "payment": "Payment",
     "delivery_address": "Delivery Address",
     "shipping_method": "Shipping Method",

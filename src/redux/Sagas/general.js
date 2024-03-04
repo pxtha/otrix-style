@@ -74,7 +74,6 @@ function* requestInit(action) {
         let getLocalWishlist = yield call(AsyncStorage.getItem, "GET_LOCAL_WISHLIST");
         logfunction("LOCAL Wishlist  ", JSON.parse(getLocalWishlist));
         getLocalWishlist = JSON.parse(getLocalWishlist);
-        console.log("getLocalWishlist::", getLocalWishlist)
         if (getLocalWishlist) {
             yield put(successWishlist(getLocalWishlist));
         }
@@ -118,19 +117,19 @@ function* addToCart(action) {
         getLocalCart = JSON.parse(getLocalCart);
         if (getLocalCart != null) {
             // let findProduct = getLocalCart.cartProducts.filter(item => item.product_id.indexOf(payload.id) > -1);
-            let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.product_id === payload.id);
+            let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.id === payload.id);
             let storeProducts = getLocalCart.cartProducts;
             if (findProductIndex > -1) {
                 let quantity = parseInt(getLocalCart.cartProducts[findProductIndex].quantity);
                 logfunction("QTY", quantity)
                 getLocalCart.cartProducts.splice(findProductIndex, 1);
                 storeProducts.push({
-                    product_id: payload.id, quantity: quantity + parseInt(payload.quantity)
+                    id: payload.id, quantity: quantity + parseInt(payload.quantity)
                 });
             }
             else {
                 storeProducts.push({
-                    product_id: payload.id, quantity: parseInt(payload.quantity)
+                    id: payload.id, quantity: parseInt(payload.quantity)
                 });
             }
             let totalQty = parseInt(getLocalCart.totalCount);
@@ -141,7 +140,7 @@ function* addToCart(action) {
             yield put(successCart(storeArr))
         }
         else {
-            let storeArr = { cartProducts: [{ product_id: payload.id, quantity: payload.quantity }], totalCount: payload.quantity };
+            let storeArr = { cartProducts: [{ id: payload.id, quantity: payload.quantity }], totalCount: payload.quantity };
             logfunction("storeArr ", storeArr);
             AsyncStorage.setItem('CART_DATA', JSON.stringify(storeArr));
             yield put(successCart(storeArr));
@@ -162,7 +161,7 @@ function* removeFromCart(action) {
         logfunction("finalCount", finalCount)
         logfunction("getLocalCart", getLocalCart)
         getLocalCart.cartProducts.forEach(function (item, index) {
-            if (item.product_id != payload.id) {
+            if (item.id != payload.id) {
                 newArr.push(item);
             }
             else {
@@ -194,14 +193,13 @@ function* incrementQuantity(action) {
         logfunction("finalCount", finalCount)
         logfunction("getLocalCart", getLocalCart)
 
-        let findProduct = getLocalCart.cartProducts.filter(item => item.product_id.indexOf(payload.id) > -1);
-        let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.product_id === payload.id);
+        let findProduct = getLocalCart.cartProducts.find(item => item.id === payload.id);
+        let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.id === payload.id);
 
-        getLocalCart.cartProducts.push({
-            product_id: findProduct[0].product_id,
-            quantity: parseInt(findProduct[0].quantity) + 1
-        });
-        getLocalCart.cartProducts.splice(findProductIndex, 1);
+        //update quantity
+        findProduct.quantity = parseInt(findProduct.quantity) + 1;
+
+        getLocalCart.cartProducts.splice(findProductIndex, 1, findProduct);
 
         let storeArr = { cartProducts: getLocalCart.cartProducts, totalCount: parseInt(finalCount) + 1 };
 
@@ -224,14 +222,13 @@ function* decrementQuantity(action) {
         logfunction("finalCount", finalCount)
         logfunction("getLocalCart", getLocalCart)
 
-        let findProduct = getLocalCart.cartProducts.filter(item => item.product_id.indexOf(payload.id) > -1);
-        let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.product_id === payload.id);
+        let findProduct = getLocalCart.cartProducts.find(item => item.id === payload.id);
+        let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.id === payload.id);
 
-        getLocalCart.cartProducts.push({
-            product_id: findProduct[0].product_id,
-            quantity: parseInt(findProduct[0].quantity) - 1
-        });
-        getLocalCart.cartProducts.splice(findProductIndex, 1);
+        //update quantity
+        findProduct.quantity = parseInt(findProduct.quantity) - 1;
+
+        getLocalCart.cartProducts.splice(findProductIndex, 1, findProduct);
 
         let storeArr = { cartProducts: getLocalCart.cartProducts, totalCount: finalCount - 1 };
 

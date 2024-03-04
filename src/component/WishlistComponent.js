@@ -1,11 +1,10 @@
-import React from 'react';
-import { View, StyleSheet, Text, FlatList, Image } from 'react-native';
-import { Colors } from '@helpers'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { OtrixDivider } from '@component';
+import { Colors } from '@helpers';
 import Fonts from '@helpers/Fonts';
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import MatIcon from 'react-native-vector-icons/FontAwesome5';
 
 function WishlistComponent(props) {
