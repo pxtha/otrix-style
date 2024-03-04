@@ -1,18 +1,16 @@
-import React from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native';
-import { Colors } from '@helpers'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import OtrixDivider from '../OtrixComponent/OtrixDivider';
+import { Colors } from '@helpers';
 import Fonts from '@helpers/Fonts';
+import React from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ASSETS_DIR, CURRENCY } from '@env';
-import FastImage from 'react-native-fast-image'
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import OtrixDivider from '../OtrixComponent/OtrixDivider';
 
 function CheckoutView(props) {
     let cartProduct = props.products;
     const PriceQuantity = (price, quantity) => {
         let amt = parseFloat(price.replace('$', ''));
-        // let qty = parseInt(quantity);
+        let qty = parseInt(quantity);
         return '$' + amt;
     }
     return (
@@ -23,16 +21,14 @@ function CheckoutView(props) {
                     <View style={styles.cartContent} key={item.id}>
                         <View style={styles.cartBox} >
                             <View style={styles.imageView}>
-                                {/* <Image source={item.image} style={styles.image}
-                                ></Image> */}
-                                <Image source={item.image} style={styles.image}
+                                <Image source={{ uri: item.image }} style={styles.image}
                                 ></Image>
                             </View>
                             <View style={styles.infromationView}>
                                 <TouchableOpacity onPress={() => props.navigation.navigate('ProductDetailScreen', { id: item.id })}>
-                                    <Text style={styles.name}>{item.name}</Text>
+                                    <Text numberOfLines={1} style={styles.name}>{item.name}</Text>
                                 </TouchableOpacity>
-                                <Text style={styles.price}>{item.special > 0 ? item.special : item.price}</Text>
+                                <Text style={styles.price}>{item.special > 0 ? PriceQuantity(item.special + "$") : PriceQuantity(item.price + "$")}</Text>
                                 <Text style={styles.quantityTxt}>{props.strings.order_details.quantity}: {item.quantity}</Text>
                             </View>
                         </View>

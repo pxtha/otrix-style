@@ -1,42 +1,38 @@
-import React, { useEffect } from "react";
+import { checkoutProcess, decrementQuantity, incrementQuantity, removeFromCart } from '@actions';
+import { GET_PRODUCTS } from '@apis/queries';
+import { useQuery } from '@apollo/client';
 import {
-    View,
-    TouchableOpacity,
-    Text,
-    StyleSheet,
-} from "react-native";
-import { connect } from 'react-redux';
-import { Input, Button } from 'native-base';
-import {
-    OtrixContainer, OtrixHeader, OtrixContent, OtrixDivider, CartView
+    CartView,
+    OtrixContainer,
+    OtrixContent, OtrixDivider,
+    OtrixHeader
 } from '@component';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { GlobalStyles, Colors } from '@helpers';
-import { _roundDimensions } from '@helpers/util';
-import { removeFromCart, decrementQuantity, incrementQuantity } from '@actions';
-import ProductListDummy from '@component/items/ProductListDummy';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { ProductsMapping } from "@component/items/ProductsMapping";
+import { Colors, GlobalStyles } from '@helpers';
 import Fonts from "@helpers/Fonts";
+import { Button } from 'native-base';
+import React, { useMemo } from "react";
+import {
+    StyleSheet,
+    Text,
+    View
+} from "react-native";
 import AwesomeAlert from 'react-native-awesome-alerts';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 
 function CheckoutScreen(props) {
-    const [state, setState] = React.useState({ loading: true, cartArr: [], cartProducts: [], sumAmount: 0, isApplied: false, validCode: false, couponCode: null, noRecord: false });
+    const { strings, cartData } = props;
+
     const [showConfirmModal, setConfirmModal] = React.useState(false)
 
-    const applyCouponCode = () => {
-        const { couponCode } = state;
-        if (couponCode != null) {
-            if (couponCode == 'cmc ecommerce') {
-                setState({ ...state, isApplied: true, validCode: true })
-            }
-            else {
-                setState({ ...state, isApplied: true, validCode: false })
-            }
+    const { data: productList, loading } = useQuery(GET_PRODUCTS, {
+        variables: {
+            page: 1,
+            perPage: 100,
         }
-        else {
-            setState({ ...state, isApplied: true, validCode: false })
-        }
-    }
+    });
 
     const onDeleteItem = (id) => {
         props.removeFromCart(id);
@@ -50,49 +46,31 @@ function CheckoutScreen(props) {
         props.incrementQuantity(id);
     }
 
-    const calculateCart = async () => {
-        let cartProducts = props.cartData;
-        let cartItems = [];
-        let sumAmount = 0;
-        // let cartProducts = await AsyncStorage.getItem("CART_DATA");
-        console.log("CART ", cartProducts)
-        //find and create array
-        cartProducts && cartProducts.length > 0 && cartProducts.forEach(function (item, index) {
-            let findedProduct = ProductListDummy.filter(product => product.id == item.product_id);
-            cartItems.push({
-                quantity: item.quantity,
-                name: findedProduct[0].name,
-                price: findedProduct[0].price,
-                image: findedProduct[0].image,
-                id: findedProduct[0].id
-            });
-            let amt = parseInt(findedProduct[0].price.replace('$', ''));
-            sumAmount += amt * item.quantity;
-        });
-        setState({ ...state, noRecord: cartProducts.length > 0 ? false : true, loading: false, cartProducts: cartItems, sumAmount: sumAmount, });
-    }
+    const cardlistArr = useMemo(() => {
+        if (!productList || !cartData) return []
+        return cartData.map((item) => {
+            const findedProduct = ProductsMapping(productList).find(product => product.id === item.id)
+            return { ...findedProduct, quantity: item.quantity }
+        })
+    }, [productList, cartData])
+
+
+    const sumAmount = useMemo(() => {
+        if (!cardlistArr) return 0;
+        return cardlistArr.reduce((acc, current) => {
+            return acc + (current.quantity * current.price)
+        }, 0)
+    }, [cardlistArr])
 
     const navToCheckout = () => {
+        props.checkoutProcess(cardlistArr);
         if (props.USER_AUTH) {
-            props.navigation.navigate("CheckoutScreen", { totalAmt: validCode ? '$' + parseFloat(sumAmount - 50) : '$' + sumAmount })
+            props.navigation.navigate("CheckoutScreen", { totalAmt: '$' + sumAmount })
         }
         else {
             setConfirmModal(true)
         }
     }
-
-    useEffect(() => {
-        // const unsubscribe = props.navigation.addListener('focus', () => {
-        //     calculateCart();
-        // });
-        calculateCart();
-
-        // Return the function to unsubscribe from the event so it gets removed on unmount
-        //  return unsubscribe;
-    }, [props.cartData]);
-
-    const { cartProducts, sumAmount, couponCode, loading, isApplied, validCode, noRecord } = state;
-    const { strings } = props;
 
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
@@ -107,11 +85,9 @@ function CheckoutScreen(props) {
             {/* Content Start from here */}
             <OtrixContent >
                 {/* Cart Component Start from here */}
+                <CartView navigation={props.navigation} products={cardlistArr} deleteItem={onDeleteItem} decrementItem={decrement} incrementItem={increment} />
                 {
-                    !noRecord && !loading && <CartView navigation={props.navigation} products={cartProducts} deleteItem={onDeleteItem} decrementItem={decrement} incrementItem={increment} />
-                }
-                {
-                    !loading && noRecord && <View style={styles.noRecord}>
+                    !loading && !cardlistArr.length && <View style={styles.noRecord}>
                         <Text style={styles.emptyTxt}>Cart is empty!</Text>
                         <Button
                             size="lg"
@@ -125,44 +101,12 @@ function CheckoutScreen(props) {
                     </View>
                 }
             </OtrixContent>
-            {!noRecord && !loading && <View style={styles.checkoutView}>
-                <View style={styles.couponInput}>
-                    <Input variant="outline" placeholder="Coupon Code (use cmc ecommerce)" style={[GlobalStyles.textInputStyle, styles.inputStyle]}
-                        onChangeText={(couponCode) => setState({ ...state, couponCode })}
-                        InputRightElement={
-                            <View style={{ flexDirection: 'row', marginRight: wp('3%'), justifyContent: 'center', alignItems: 'center' }}>
-                                {
-                                    isApplied ?
-                                        validCode ? <Icon name={"checkmark-circle"} size={18} color={'#3ad35c'} />
-                                            : <Icon name={"ios-close-circle"} size={18} color={'red'} />
-                                        : null
-                                }
-                                <TouchableOpacity style={styles.applyView} onPress={() => applyCouponCode()}>
-                                    <Text style={styles.applyTxt}>{strings.cart.apply}</Text>
-                                </TouchableOpacity>
-                            </View>
-                        }
-                    />
-                </View>
+            {!loading && cardlistArr.length > 0 && <View style={styles.checkoutView}>
                 <View style={GlobalStyles.horizontalLine}></View>
                 <OtrixDivider size={'sm'} />
                 <View style={styles.totalView}>
-                    <Text style={styles.leftTxt}>{strings.cart.sub_total}</Text>
-                    <Text style={styles.rightTxt}>${sumAmount}</Text>
-                </View>
-                <View style={styles.totalView}>
-                    <Text style={styles.leftTxt}>Discount</Text>
-                    <Text style={styles.rightTxt}>$0</Text>
-                </View>
-                {
-                    validCode && <View style={styles.totalView}>
-                        <Text style={styles.leftTxt}>{strings.cart.coupon} ({couponCode})</Text>
-                        <Text style={styles.rightTxt}>-$50</Text>
-                    </View>
-                }
-                <View style={styles.totalView}>
                     <Text style={styles.leftTxt}>{strings.cart.total}</Text>
-                    <Text style={[styles.rightTxt, { color: Colors().link_color, fontSize: wp('5.5%') }]}>{validCode ? '$' + parseFloat(sumAmount - 50) : '$' + sumAmount}</Text>
+                    <Text style={[styles.rightTxt, { color: Colors().link_color, fontSize: wp('5.5%') }]}>{'$' + sumAmount}</Text>
                 </View>
                 <Button
                     size="md"
@@ -195,7 +139,7 @@ function CheckoutScreen(props) {
                 }}
                 onConfirmPressed={() => {
                     setConfirmModal(false)
-                    props.navigation.navigate("CheckoutScreen", { totalAmt: validCode ? '$' + parseFloat(sumAmount - 50) : '$' + sumAmount })
+                    props.navigation.navigate("CheckoutScreen", { totalAmt: '$' + sumAmount })
                 }}
             />
         </OtrixContainer >
@@ -211,13 +155,13 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { removeFromCart, decrementQuantity, incrementQuantity })(CheckoutScreen);
+export default connect(mapStateToProps, { removeFromCart, decrementQuantity, incrementQuantity, checkoutProcess })(CheckoutScreen);
 
 const styles = StyleSheet.create({
 
     checkoutView: {
         backgroundColor: Colors().light_white,
-        height: hp('32%'),
+        height: hp('15%'),
         shadowColor: 'grey',
         shadowOffset: { width: 0, height: 0.4 },
         shadowOpacity: 0.30,
@@ -270,5 +214,6 @@ const styles = StyleSheet.create({
         marginVertical: hp('1.5%'),
         fontFamily: Fonts.Font_Semibold,
         color: Colors().secondry_text_color
-    }
+    },
+
 }); 

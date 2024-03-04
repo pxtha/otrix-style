@@ -118,8 +118,6 @@ function MyTabs(props) {
                                     <Text style={[GlobalStyles.badgeText, styles.countText, { fontSize: cartCount > 9 ? wp('2.4%') : wp('3%') }]}>{cartCount}</Text>
                                 </Badge>
                             }
-
-
                         </View>
                     ),
                 }} />
@@ -283,6 +281,7 @@ const styles = StyleSheet.create({
     },
     countText: {
         color: Colors().link_color,
-        fontFamily: Fonts.Font_Bold
+        fontFamily: Fonts.Font_Bold,
+        width: wp("10%")
     }
 });

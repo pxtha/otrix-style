@@ -1,14 +1,24 @@
 import { addToCart, addToWishList } from '@actions';
-import { GET_PRODUCT, GET_FILTERS } from "@apis/queries";
+import { GET_PRODUCT } from "@apis/queries";
 import { useQuery } from '@apollo/client';
 import { bottomCart, checkround2, close } from '@common';
 import {
-    OtrixContainer, OtrixContent, OtrixDivider, OtrixAlert, OtirxBackButton, OtrixLoader, SimilarProduct, SizeContainerComponent, RatingComponent
+    OtirxBackButton,
+    OtrixAlert,
+    OtrixContainer, OtrixContent, OtrixDivider,
+    OtrixLoader,
+    RatingComponent,
+    SimilarProduct, SizeContainerComponent
 } from '@component';
+import { filterMapping } from "@component/items/FilterMapping";
+import { ProductMapping } from "@component/items/ProductsMapping";
+import { SimilarProductsMapping } from "@component/items/SimilarProductsMapping";
 import { Colors, GlobalStyles } from '@helpers';
+import Fonts from "@helpers/Fonts";
+import { _addToWishlist } from "@helpers/FunctionHelper";
 import { useRoute } from '@react-navigation/native';
 import { Badge, Button, ScrollView } from "native-base";
-import React, { useEffect, useMemo, } from "react";
+import React, { useMemo } from "react";
 import {
     Image,
     Modal,
@@ -20,24 +30,17 @@ import {
 import { SliderBox } from 'react-native-image-slider-box';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import Stars from 'react-native-stars';
 import Icon from 'react-native-vector-icons/AntDesign';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MaterialIconsIcon from 'react-native-vector-icons/MaterialIcons';
 import { connect } from 'react-redux';
-import { ProductMapping } from "@component/items/ProductsMapping";
-import { SimilarProductsMapping } from "@component/items/SimilarProductsMapping";
-import Fonts from "@helpers/Fonts";
-import { filterMapping } from "@component/items/FilterMapping";
 import { reviewMapping } from '../component/items/ReviewMapping';
-import { _addToWishlist, _getWishlist } from "@helpers/FunctionHelper";
 
 function ProductDetailScreen(props) {
     const { cartCount, strings, wishlistData } = props;
 
-    console.log("props::", wishlistData)
     const { id } = useRoute().params;
-    const [state, setState] = React.useState({ productCount: 1, cartCountState: props?.cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
+    const [state, setState] = React.useState({ productCount: 1, cartCountState: cartCount, productDetail: null, fetchCart: false, selectedColor: 1, showZoom: false, zoomImages: [], });
     const { selectedColor, productCount, zoomImages, cartCountState, showZoom, fetchCart } = state;
     const [msg, setMsg] = React.useState({ message: null, type: null })
     const { message, type } = msg;
@@ -75,7 +78,7 @@ function ProductDetailScreen(props) {
     }, [data])
 
     const _CartData = () => {
-        setState({ ...state, fetchCart: false, cartCountState: props.cartCount })
+        setState({ ...state, fetchCart: false, cartCountState: cartCount })
         if (cartCountState < props.cartCount) {
             setMsg({ message: 'Product Successfully Added To Cart', type: 'success' });
         }
@@ -93,7 +96,7 @@ function ProductDetailScreen(props) {
 
     const _addToCart = () => {
         console.log("PRODU ", productDetail.id)
-        setState({ ...state, fetchCart: true })
+        setState({ ...state, fetchCart: false })
         props.addToCart(productDetail.id, parseInt(productCount))
     }
 

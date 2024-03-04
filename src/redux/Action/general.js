@@ -154,3 +154,12 @@ export function storeFCM(fcmToken) {
         }
     }
 }
+
+export function checkoutProcess(payload) {
+    return {
+        type: types.CHECKOUT_PROCESS,
+        payload: {
+            checkoutData: payload
+        }
+    }
+}
