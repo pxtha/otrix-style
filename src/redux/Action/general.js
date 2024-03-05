@@ -138,6 +138,16 @@ export function doLogin(data, navigateTo) {
     }
 }
 
+export function doRegister(data, navigateTo) {
+    return {
+        type: types.DO_REGISTER,
+        payload: {
+            data,
+            navigateTo
+        }
+    }
+}
+
 export function doLogout() {
     return {
         type: types.DO_LOGOUT,
@@ -160,6 +170,17 @@ export function checkoutProcess(payload) {
         type: types.CHECKOUT_PROCESS,
         payload: {
             checkoutData: payload
+        }
+    }
+}
+
+export function authUserInfo(data) {
+    logfunction("PAYLOAD IN  USER INFO DATA", data)
+
+    return {
+        type: types.AUTH_USER_INFO,
+        payload: {
+            userInfo: data
         }
     }
 }

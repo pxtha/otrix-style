@@ -96,7 +96,7 @@ function LoginScreen(props) {
     }
 
     //facebook login 🧔🏻
-    _fbAuth = () => {
+    const _fbAuth = () => {
         // Attempt a login using the Facebook login dialog asking for default permissions and email.
         LoginManager.logInWithPermissions(['public_profile', 'email']).then(
             (result) => {
@@ -197,7 +197,7 @@ function LoginScreen(props) {
 
 
     //google sigin
-    _googleAuth = async () => {
+    const _googleAuth = async () => {
         try {
             const userInfo = await GoogleSignin.signIn();
             logfunction("Google response ", userInfo)
@@ -392,7 +392,7 @@ function LoginScreen(props) {
                     <OtrixDivider size={'md'} />
 
                     {/* Social Container Component */}
-                    <OtrixSocialContainer facebookLogin={_fbAuth} googleLogin={_googleAuth} />
+                    {/* <OtrixSocialContainer facebookLogin={_fbAuth} googleLogin={_googleAuth} /> */}
 
                     <OtrixDivider size={'md'} />
                 </View>

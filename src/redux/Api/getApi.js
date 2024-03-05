@@ -2,9 +2,9 @@ import { ACCESS_TOKEN, API_URL } from "@common/config";
 import * as RootNavigation from '../../AppNavigator';
 
 var authHeader = new Headers();
-authHeader.append("accept", "application/json");
-authHeader.append("Content-Type", "multipart/form-data");
-authHeader.append("token", ACCESS_TOKEN);
+authHeader.append("Accept", "application/json");
+authHeader.append("Content-Type", "application/json");
+// authHeader.append("authorization", ACCESS_TOKEN);
 
 const getDataService = {
 
@@ -70,6 +70,33 @@ const getDataService = {
             .then(async responseJson => {
                 return responseJson;
             })
+            .catch(error => {
+                console.error(error);
+            });
+    },
+
+    login: async function (payload) {
+        const authApi = 'http://192.168.52.102:1337/api/auth/local'
+        console.log(payload, "login payload::")
+        return fetch(authApi, {
+            method: "POST",
+            headers: authHeader,
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
+            .catch(error => {
+                console.error(error);
+            });
+    },
+
+    register: async function (payload) {
+        const authApi = '/api/auth/local/register'
+        return fetch(API_URL + authApi, {
+            method: "POST",
+            headers: authHeader,
+            body: JSON.stringify(payload)
+        })
+            .then(response => response.json())
             .catch(error => {
                 console.error(error);
             });

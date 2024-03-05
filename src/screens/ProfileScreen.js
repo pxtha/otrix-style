@@ -15,7 +15,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { GlobalStyles, Colors } from '@helpers';
 import { _roundDimensions } from '@helpers/util';
 import { doLogout, authData } from '@actions';
-import { avatarImg } from '@common';
+import { avatarImg2 } from '@common';
 import Fonts from "@helpers/Fonts";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MatIcon from 'react-native-vector-icons/MaterialIcons';
@@ -32,8 +32,10 @@ import AsyncStorage from '@react-native-community/async-storage'
 function ProfileScreen(props) {
     const [state, setState] = React.useState({ profileImage: null, profileImageURL: null, type: 'error', message: null });
     const [showMessage, setShowLoading] = React.useState(false)
+    const { userInfo } = props;
 
     useEffect(() => {
+        console.log(props.userInfo)
         let image = null;
         if (props.customerData && props.customerData.image != null) {
             if (props.customerData.creation == null || props.customerData.creation == 'D') {
@@ -101,8 +103,15 @@ function ProfileScreen(props) {
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
             <View style={styles.container} >
-
-                <TouchableOpacity style={styles.imageView}
+                <Image
+                    ml="3"
+                    size="sm"
+                    style={styles.avatarImg}
+                    source={avatarImg2}
+                >
+                </Image>
+                {/* Update avatar */}
+                {/* <TouchableOpacity style={styles.imageView}
                     onPress={() => launchImageLibrary(
                         {
                             mediaType: 'photo',
@@ -123,10 +132,10 @@ function ProfileScreen(props) {
                     {profileImage == null && profileImageURL == null && <Image source={avatarImg} style={styles.image}></Image>}
 
 
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <OtrixDivider size={'sm'} />
-                <Text style={styles.username}>Cmc ecommerce User</Text>
-                <Text style={styles.email}>cmcecommerce@mail.com</Text>
+                <Text style={styles.username}>{userInfo.username}</Text>
+                <Text style={styles.email}>{userInfo.email}</Text>
 
             </View>
 
@@ -243,6 +252,7 @@ function mapStateToProps(state) {
     return {
         cartData: state.cart.cartData,
         customerData: state.auth.USER_DATA,
+        userInfo: state.auth.userInfo,
         strings: state.mainScreenInit.strings
     }
 }
