@@ -180,7 +180,8 @@ export function authUserInfo(data) {
     return {
         type: types.AUTH_USER_INFO,
         payload: {
-            userInfo: data
+            userInfo: data.user,
+            token: data.jwt
         }
     }
 }

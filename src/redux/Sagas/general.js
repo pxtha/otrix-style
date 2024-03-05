@@ -83,9 +83,10 @@ function* requestInit(action) {
         if (getAuth == 1) {
             yield put(authStatus(true));
             let getData = yield call(AsyncStorage.getItem, "CUSTOMER_DATA")
+            let userInfo = yield call(AsyncStorage.getItem, "USER_INFO")
+
             yield put(authData(JSON.parse(getData)));
-
-
+            yield put(authUserInfo(JSON.parse(userInfo)));
 
         }
         else {
@@ -274,8 +275,8 @@ function* doLogin(action) {
 
         if (responseLogin && responseLogin.jwt) {
             AsyncStorage.setItem('IS_AUTH', '1');
-            AsyncStorage.setItem('TOKEN', responseLogin.jwt);
-            yield put(authUserInfo(responseLogin.user))
+            AsyncStorage.setItem('USER_INFO', JSON.stringify(responseLogin));
+            yield put(authUserInfo(responseLogin))
             yield put(authStatus(true));
         }
     } catch (e) {
@@ -307,6 +308,7 @@ function* doLogout(action) {
     try {
         const { payload } = action;
         AsyncStorage.removeItem('IS_AUTH');
+        AsyncStorage.removeItem('USER_INFO');
         yield put(authStatus(false));
     } catch (e) {
         logfunction('ERROR =', e)

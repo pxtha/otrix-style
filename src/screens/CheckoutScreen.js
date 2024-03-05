@@ -45,6 +45,7 @@ function CheckoutScreen(props) {
 
     const { step, selectedPaymentMethod, paymentSuccessModal, comment } = state;
 
+    console.log("USER_AUTH::", props.USER_AUTH)
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
