@@ -3,6 +3,7 @@ import { logfunction } from "../../helpers/FunctionHelper";
 
 const initialState = {
     authStatus: false,
+    userInfo: {}
 }
 export default (state = initialState, action) => {
     const { payload } = action;
@@ -13,6 +14,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 authStatus: payload.status,
+            }
+        case types.AUTH_USER_INFO:
+            return {
+                ...state,
+                userInfo: { ...payload.userInfo }
             }
         default:
             return state;

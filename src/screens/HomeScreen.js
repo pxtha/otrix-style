@@ -1,7 +1,7 @@
 import { addToWishList } from '@actions';
 import { GET_HOME_DATA } from "@apis/queries";
 import { useQuery } from "@apollo/client";
-import { avatarImg, avatarImg2, heart } from '@common';
+import { avatarImg2, heart } from '@common';
 import {
     BestDeal,
     HomeCategoryView,
@@ -57,30 +57,13 @@ function HomeScreen(props) {
             {/* Header */}
             <OtrixHeader customStyles={{ backgroundColor: Colors().white }}>
                 <TouchableOpacity style={styles.headerLeft} onPress={() => props.navigation.navigate('ProfileScreen')}>
-                    {
-                        authStatus ?
-
-
-                            <View style={{
-                                marginLeft: wp('2%'), alignItems: 'center',
-                                elevation: 2,
-                                borderWidth: 2, borderColor: Colors().white, height: hp('6%'), width: wp('13%')
-                            }}>
-                                <Image
-                                    ml="3"
-                                    size="sm"
-                                    style={{ resizeMode: 'contain', height: hp('5.4%'), }}
-                                    source={avatarImg}
-                                />
-                            </View>
-                            : <Image
-                                ml="3"
-                                size="sm"
-                                style={styles.avatarImg}
-                                source={avatarImg2}
-                            >
-                            </Image>
-                    }
+                    <Image
+                        ml="3"
+                        size="sm"
+                        style={styles.avatarImg}
+                        source={avatarImg2}
+                    >
+                    </Image>
                 </TouchableOpacity>
                 <View style={styles.headerCenter}>
                     <Text style={styles.headingTxt}>CMC ECOMMERCE</Text>

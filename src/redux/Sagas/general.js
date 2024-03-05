@@ -1,12 +1,13 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { types } from "@actions/actionTypes";
 import {
-    successInt, successCart, successCheckout, authStatus, authData, successWishlist, addRemoveWishlist
+    successInt, successCart, successCheckout, authStatus, authData, successWishlist, addRemoveWishlist, authUserInfo
 } from "@actions";
 import AsyncStorage from '@react-native-community/async-storage'
 import { logfunction, _getLocalCart } from "@helpers/FunctionHelper";
 import * as RootNavigation from '../../AppNavigator';
 import { changeLanguage, getLanguage } from '../../locales/i18n';
+import getDataService from "../Api/getApi";
 
 export function* watchGeneralRequest() {
     yield takeEvery(types.REQUEST_INIT, requestInit);
@@ -17,6 +18,7 @@ export function* watchGeneralRequest() {
     yield takeEvery(types.DEREMENT_QUANTITY, decrementQuantity);
     yield takeEvery(types.PROCEED_CHECKOUT, proceedCheckout);
     yield takeEvery(types.DO_LOGIN, doLogin);
+    yield takeEvery(types.DO_REGISTER, doRegister);
     yield takeEvery(types.DO_LOGOUT, doLogout);
 }
 
@@ -263,9 +265,39 @@ function* addToWishlist(action) {
 
 function* doLogin(action) {
     try {
-        const { payload } = action;
-        AsyncStorage.setItem('IS_AUTH', '1');
-        yield put(authStatus(true));
+        const { email, password } = action.payload.data;
+
+        const responseLogin = yield call(getDataService.login, {
+            identifier: email,
+            password: password
+        })
+
+        if (responseLogin && responseLogin.jwt) {
+            AsyncStorage.setItem('IS_AUTH', '1');
+            AsyncStorage.setItem('TOKEN', responseLogin.jwt);
+            yield put(authUserInfo(responseLogin.user))
+            yield put(authStatus(true));
+        }
+    } catch (e) {
+        logfunction('ERROR =', e)
+    }
+}
+
+function* doRegister(action) {
+    try {
+        console.log("doRegister::", action.payload)
+        // const { email, password } = action.payload.data;
+        // const responseLogin = yield call(getDataService.register, {
+        //     identifier: email,
+        //     password: password
+        // })
+
+        // if (responseLogin && responseLogin.jwt) {
+        //     AsyncStorage.setItem('IS_AUTH', '1');
+        //     AsyncStorage.setItem('TOKEN', responseLogin.jwt);
+        //     yield put(authUserInfo(responseLogin.user))
+        //     yield put(authStatus(true));
+        // }
     } catch (e) {
         logfunction('ERROR =', e)
     }

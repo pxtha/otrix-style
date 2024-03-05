@@ -14,7 +14,8 @@ import { GlobalStyles, Colors, isValidEmail, isValidMobile, isValidpassword, isV
 import Icon from 'react-native-vector-icons/Ionicons';
 import { logfunction } from "@helpers/FunctionHelper";
 import Fonts from "@helpers/Fonts";
-import getApi from "@apis/getApi";
+import { doRegister } from '@actions';
+import { bindActionCreators } from 'redux';
 
 function RegisterScreen(props) {
     const [formData, setData] = React.useState({ firstName: null, lastName: null, email: null, mobileNumber: null, password: null, cpassword: null, submited: false, type: null, message: null, loading: false });
@@ -106,6 +107,7 @@ function RegisterScreen(props) {
 
             try {
                 //API Stuff here
+                props.doRegister({ email: email, password: password });
                 setData({
                     ...formData,
                     loading: false
@@ -295,7 +297,13 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(RegisterScreen);
+const mapDispatchToProps = dispatch => (
+    bindActionCreators({
+        doRegister
+    }, dispatch)
+);
+
+export default connect(mapStateToProps, mapDispatchToProps)(RegisterScreen);
 
 const styles = StyleSheet.create({
 

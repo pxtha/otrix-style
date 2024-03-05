@@ -16,10 +16,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Fonts from "../helpers/Fonts";
 
 function EditProfileScreen(props) {
-    const [state, setData] = React.useState({ first_name: 'Cmc ecommerce', last_name: "User", email: "cmcecommerce@mail.com", phone: "9898989898", submited: false });
+    const { strings, userInfo } = props;
+    const [state, setData] = React.useState(() => ({ first_name: userInfo.username, last_name: "", email: userInfo.email, phone: "", submited: false }));
 
     const { first_name, last_name, email, phone, submited } = state;
-    const { strings } = props;
 
     return (
         <OtrixContainer>
@@ -112,7 +112,8 @@ function EditProfileScreen(props) {
 
 function mapStateToProps(state) {
     return {
-        strings: state.mainScreenInit.strings
+        strings: state.mainScreenInit.strings,
+        userInfo: state.auth.userInfo,
     }
 }
 
