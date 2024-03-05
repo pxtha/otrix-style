@@ -64,7 +64,7 @@ function CheckoutScreen(props) {
 
     const navToCheckout = () => {
         props.checkoutProcess(cardlistArr);
-        if (props.USER_AUTH) {
+        if (props.authStatus) {
             props.navigation.navigate("CheckoutScreen", { totalAmt: '$' + sumAmount })
         }
         else {
@@ -150,7 +150,7 @@ function mapStateToProps(state) {
     return {
         cartData: state.cart.cartData,
         strings: state.mainScreenInit.strings,
-        USER_AUTH: state.auth.USER_AUTH,
+        authStatus: state.auth.authStatus,
     }
 }
 

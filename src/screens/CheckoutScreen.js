@@ -45,7 +45,6 @@ function CheckoutScreen(props) {
 
     const { step, selectedPaymentMethod, paymentSuccessModal, comment } = state;
 
-    console.log("USER_AUTH::", props.USER_AUTH)
     return (
         <OtrixContainer customStyles={{ backgroundColor: Colors().light_white }}>
 
@@ -176,7 +175,7 @@ function CheckoutScreen(props) {
             {/* Payment Modal  */}
             <Modal visible={paymentSuccessModal}
                 transparent={true}>
-                <PaymentSuccessComponent closePaymentModal={closePay} auth={props.USER_AUTH} strings={strings} navigation={props.navigation} />
+                <PaymentSuccessComponent closePaymentModal={closePay} auth={props.authStatus} strings={strings} navigation={props.navigation} />
             </Modal>
 
         </OtrixContainer >
@@ -187,8 +186,7 @@ function mapStateToProps(state) {
     return {
         checkoutData: state.checkout.checkoutData,
         strings: state.mainScreenInit.strings,
-        USER_AUTH: state.auth.USER_AUTH,
-
+        authStatus: state.auth.authStatus,
     }
 }
 

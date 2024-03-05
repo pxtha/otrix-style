@@ -310,6 +310,10 @@ function* doLogout(action) {
         AsyncStorage.removeItem('IS_AUTH');
         AsyncStorage.removeItem('USER_INFO');
         yield put(authStatus(false));
+        yield put(authUserInfo({
+            jwt: "",
+            user: {}
+        }))
     } catch (e) {
         logfunction('ERROR =', e)
     }
