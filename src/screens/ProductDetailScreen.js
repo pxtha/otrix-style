@@ -1,4 +1,4 @@
-import { addToCart, addToWishList } from '@actions';
+import { addToCart, updateToWishList } from '@actions';
 import { GET_PRODUCT } from "@apis/queries";
 import { useQuery } from '@apollo/client';
 import { bottomCart, checkround2, close } from '@common';
@@ -103,7 +103,7 @@ function ProductDetailScreen(props) {
     const _addToFav = async () => {
         console.log("CLiCK")
         let wishlistData = await _addToWishlist(id);
-        props.addToWishList(wishlistData)
+        props.updateToWishList(wishlistData, id)
     }
     // useEffect(() => {
     //     // let findProduct = productDetail.filter(p => p.id == id);
@@ -337,7 +337,7 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps, { addToCart, addToWishList })(ProductDetailScreen);
+export default connect(mapStateToProps, { addToCart, updateToWishList })(ProductDetailScreen);
 
 const styles = StyleSheet.create({
     productDetailView: {

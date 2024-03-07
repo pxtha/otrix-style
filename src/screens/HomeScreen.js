@@ -1,4 +1,4 @@
-import { addToWishList } from '@actions';
+import { updateToWishList } from '@actions';
 import { GET_HOME_DATA } from "@apis/queries";
 import { useQuery } from "@apollo/client";
 import { avatarImg2, heart } from '@common';
@@ -35,21 +35,14 @@ function HomeScreen(props) {
     const { deal, new_arrival, trending, banner } = data?.home?.data?.attributes || {}
 
 
-    const { authStatus, strings, wishlistData, wishlistCount } = props;
+    const { strings, wishlistData, wishlistCount } = props;
     const offerBanner = bannerMapping(banner).filter(v => v !== null);
     const [bannerTop = {}, bannerMid = {}, bannerBot = {}] = offerBanner;
 
     const addToWish = async (id) => {
         let wishlistData = await _addToWishlist(id);
-        props.addToWishList(wishlistData);
+        props.updateToWishList(wishlistData, id);
     }
-
-    useEffect(() => {
-        (async function () {
-            const wishlistData = await _getWishlist();
-            props.addToWishList(wishlistData);
-        })();
-    }, [])
 
     return (
 
@@ -139,14 +132,13 @@ function HomeScreen(props) {
 }
 function mapStateToProps(state) {
     return {
-        authStatus: state.auth.authStatus,
         wishlistData: state.wishlist.wishlistData,
         wishlistCount: state.wishlist.wishlistCount,
         strings: state.mainScreenInit.strings
     }
 }
 
-export default connect(mapStateToProps, { addToWishList })(HomeScreen);
+export default connect(mapStateToProps, { updateToWishList })(HomeScreen);
 
 const styles = StyleSheet.create({
     headerRight: {

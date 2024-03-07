@@ -16,7 +16,7 @@ import {
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { GlobalStyles, Colors } from '@helpers';
 import { _roundDimensions } from '@helpers/util';
-import { addToWishList } from '@actions';
+import { updateToWishList } from '@actions';
 import { filter } from '@common';
 import { _addToWishlist, _getWishlist, logfunction } from "@helpers/FunctionHelper";
 import { ProductListSkeleton } from '@skeleton';
@@ -114,7 +114,7 @@ function ProductListScreen(props) {
 
     const addToWishlist = async (id) => {
         let wishlistData = await _addToWishlist(id);
-        props.addToWishList(wishlistData);
+        props.updateToWishList(wishlistData, id);
     }
 
     useEffect(() => {
@@ -195,7 +195,7 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps, { addToWishList })(ProductListScreen);
+export default connect(mapStateToProps, { updateToWishList })(ProductListScreen);
 
 const styles = StyleSheet.create({
     content: { flex: 1, marginHorizontal: wp('3%') },

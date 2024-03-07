@@ -5,7 +5,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Fonts from '@helpers/Fonts';
 import Stars from 'react-native-stars';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { addToWishList } from '@actions';
+import { updateToWishList } from '@actions';
 import { _addToWishlist } from "@helpers/FunctionHelper";
 import { connect } from 'react-redux';
 
@@ -15,7 +15,7 @@ function ProductView(props) {
 
     const addToWish = async (id) => {
         let wishlistData = await _addToWishlist(id);
-        props.addToWishList(wishlistData);
+        props.updateToWishList(wishlistData, id);
     }
 
     return (
@@ -75,7 +75,7 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps, { addToWishList })(ProductView);
+export default connect(mapStateToProps, { updateToWishList })(ProductView);
 
 const styles = StyleSheet.create({
     productBox: {

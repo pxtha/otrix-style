@@ -84,7 +84,7 @@ function LoginScreen(props) {
                 });
 
                 props.doLogin({ email: email, password: password });
-                props.navigation.push("MainScreen")
+                // props.navigation.push("MainScreen")
             } catch (error) {
                 logfunction("Error", error)
                 setData({

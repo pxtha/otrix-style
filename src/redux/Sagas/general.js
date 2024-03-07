@@ -1,18 +1,20 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { types } from "@actions/actionTypes";
 import {
-    successInt, successCart, successCheckout, authStatus, authData, successWishlist, addRemoveWishlist, authUserInfo
+    successInt, successCart, successCheckout, authStatus, authData, successWishlist, addRemoveWishlist, authUserInfo, successGetToWishlist, addToWishList
 } from "@actions";
 import AsyncStorage from '@react-native-community/async-storage'
 import { logfunction, _getLocalCart } from "@helpers/FunctionHelper";
 import * as RootNavigation from '../../AppNavigator';
 import { changeLanguage, getLanguage } from '../../locales/i18n';
 import getDataService from "../Api/getApi";
+import { wishlistMapping } from "@component/items/WishlistMapping";
 
 export function* watchGeneralRequest() {
     yield takeEvery(types.REQUEST_INIT, requestInit);
     yield takeEvery(types.ADD_TO_CART, addToCart);
-    yield takeEvery(types.ADD_TO_WISHLIST, addToWishlist);
+    yield takeEvery(types.GET_TO_WISHLIST, getToWishlist);
+    yield takeEvery(types.UPDATE_TO_WISHLIST, updateToWishlist);
     yield takeEvery(types.REMOVE_CART, removeFromCart);
     yield takeEvery(types.INCREMENT_QUANTITY, incrementQuantity);
     yield takeEvery(types.DEREMENT_QUANTITY, decrementQuantity);
@@ -72,13 +74,8 @@ function* requestInit(action) {
             yield put(successCart(getLocalCart));
         }
 
-        //Wishlist count set
-        let getLocalWishlist = yield call(AsyncStorage.getItem, "GET_LOCAL_WISHLIST");
-        logfunction("LOCAL Wishlist  ", JSON.parse(getLocalWishlist));
-        getLocalWishlist = JSON.parse(getLocalWishlist);
-        if (getLocalWishlist) {
-            yield put(successWishlist(getLocalWishlist));
-        }
+        //Wishlist latest
+        yield put(successGetToWishlist())
 
         if (getAuth == 1) {
             yield put(authStatus(true));
@@ -87,7 +84,6 @@ function* requestInit(action) {
 
             yield put(authData(JSON.parse(getData)));
             yield put(authUserInfo(JSON.parse(userInfo)));
-
         }
         else {
             yield put(authStatus(false));
@@ -255,10 +251,56 @@ function* proceedCheckout(action) {
     }
 }
 
-function* addToWishlist(action) {
+function* updateToWishlist(action) {
     try {
-        let wishData = { totalCount: action.payload.data.length, wishlistData: action.payload.data }
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+        const userId = JSON.parse(getAuth).user.id;
+
+        let wishlistId = yield call(AsyncStorage.getItem, "WISHLIST_ID")
+        const wishlistParser = JSON.parse(wishlistId) ?? [];
+        let result = [...wishlistParser];
+
+        const { productId, data } = action.payload;
+
+        let wishData = { totalCount: data.length, wishlistData: data }
+
+        if (data.includes(productId)) {
+            const responseSuccess = yield call(getDataService.addToWishList, userId, data, token)
+            //update wishlist
+            result = [...wishlistParser, { wishlistId: responseSuccess.data.id, productId }]
+
+        } else {
+            const found = result.find((v) => v.productId == productId)
+            yield call(getDataService.removeWishList, found.wishlistId, token)
+            result = wishlistParser.filter(v => v.productId != productId)
+        }
+
+        AsyncStorage.setItem("WISHLIST_ID", JSON.stringify(result));
         yield put(successWishlist(wishData));
+    } catch (e) {
+        logfunction('ERROR =', e)
+    }
+}
+
+function* getToWishlist() {
+    try {
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+        const userId = JSON.parse(getAuth).user.id;
+        const getWishlist = yield call(getDataService.getUserWishList, userId, token)
+
+        if (getWishlist && getWishlist.data.length) {
+            const wishlistDataMapping = wishlistMapping(getWishlist.data);
+            AsyncStorage.setItem("WISHLIST_ID", JSON.stringify(wishlistDataMapping));
+
+            const productListIds = wishlistDataMapping.map(v => v.productId);
+            let wishData = { totalCount: productListIds.length, wishlistData: productListIds }
+
+            if (wishData) {
+                yield put(successWishlist(wishData));
+            }
+        }
     } catch (e) {
         logfunction('ERROR =', e)
     }
