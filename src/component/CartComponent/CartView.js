@@ -11,7 +11,6 @@ import MatIcon from 'react-native-vector-icons/FontAwesome5';
 function CartView(props) {
     let cartProduct = props.products;
     const PriceQuantity = (price, quantity) => {
-        console.log(quantity)
         let amt = parseFloat(price.replace('$', ''));
         let qty = parseInt(quantity);
         return '$' + amt;

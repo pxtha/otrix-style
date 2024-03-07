@@ -1,5 +1,6 @@
 import { ACCESS_TOKEN, API_URL } from "@common/config";
 import * as RootNavigation from '../../AppNavigator';
+import { APP_URL_ENV } from "@env"
 
 var authHeader = new Headers();
 authHeader.append("Accept", "application/json");
@@ -76,9 +77,8 @@ const getDataService = {
     },
 
     login: async function (payload) {
-        const authApi = 'http://192.168.52.102:1337/api/auth/local'
-        console.log(payload, "login payload::")
-        return fetch(authApi, {
+        const authApi = '/api/auth/local'
+        return fetch(APP_URL_ENV + authApi, {
             method: "POST",
             headers: authHeader,
             body: JSON.stringify(payload)
@@ -91,7 +91,7 @@ const getDataService = {
 
     register: async function (payload) {
         const authApi = '/api/auth/local/register'
-        return fetch(API_URL + authApi, {
+        return fetch(APP_URL_ENV + authApi, {
             method: "POST",
             headers: authHeader,
             body: JSON.stringify(payload)
@@ -100,6 +100,131 @@ const getDataService = {
             .catch(error => {
                 console.error(error);
             });
+    },
+
+    addToWishList: async (userId, wishListArray, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+
+        const requestList = wishListArray.map((item) => {
+            let request = new Request(`${APP_URL_ENV}/api/wishlists?populate=*&filters[user_id][id][$eq]=${userId}&filters[product][id]=${item}`, {
+                headers: headers,
+                method: 'GET'
+            });
+
+            return fetch(request).then(res => res.json());
+        })
+
+        const reponseList = await Promise.all(requestList);
+
+        const indexWishlist = reponseList.findIndex(response => response.data.length === 0);
+        const payload = {
+            data: {
+                user_id: userId,
+                product: wishListArray[indexWishlist],
+            }
+        }
+
+        return fetch(`${APP_URL_ENV}/api/wishlists`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(payload)
+        }).then(r => r.json()).catch(error => {
+            console.error(error);
+        });
+
+    },
+
+
+    AddToCartList: async (userId, cartListArray) => {
+        try {
+            cartListArray.map(async (item) => {
+                const lastProductInCarOfUser = await axiosClient.get(`/carts?populate=*&filters[user_id][id][$eq]=${userId}&filters[product][id]=${item.product}`)
+                if (lastProductInCarOfUser?.data?.data?.length > 0) {
+                    const params = {
+                        quantity: item.amount,
+                    }
+                    await axiosClient.put(`/carts/${lastProductInCarOfUser?.data?.data[0]?.id}`, { data: params })
+                } else {
+                    const params = {
+                        user_id: userId,
+                        product: item.product,
+                        quantity: item.amount,
+                    }
+                    await axiosClient.post('/carts', { data: params })
+                }
+            })
+        } catch (e) {
+            console.log(e)
+        }
+
+    },
+
+    removeWishList: async (productId, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+
+        return fetch(`${APP_URL_ENV}/api/wishlists/${productId}`, {
+            method: "DELETE",
+            headers: headers,
+        }).then(r => r.json()).catch(error => {
+            console.error(error);
+        });
+    },
+
+    RemoveCart: async (id, userid) => {
+        await axiosClient.get(`/carts?populate=*&filters[user_id][id][$eq]=${userid}&filters[product][id]=${id}`).then(
+            (response) => {
+                if (response?.data?.data?.length > 0) {
+                    axiosClient.delete('/carts/' + response?.data?.data[0]?.id)
+                }
+            })
+    },
+
+    getUserWishList: (id, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+
+        return fetch(`${APP_URL_ENV}/api/wishlists?populate[product][populate][0]=product_variants&populate[product][populate][1]=images&filters[user_id][id][$eq]=${id}`, {
+            method: "GET",
+            headers: headers,
+        }).then(r => r.json()).catch(error => {
+            console.error(error);
+        });
+
+        // const response = await axiosClient.get('/wishlists?populate[product][populate][0]=product_variants&populate[product][populate][1]=images&filters[user_id][id][$eq]=' + id)
+        // const wishlist = []
+        // if (response) {
+        //     response?.data.map((item) => (
+        //         wishlist.push(item?.attributes?.product?.data)
+        //     ))
+        // }
+        // return wishlist
+    },
+
+    GetUserCart: async (id) => {
+        const response = await axiosClient.get('/carts?populate[product][populate]=*&populate[size]=*&populate[product_variant]=*&filters[user_id][id][$eq]=' + id)
+        if (response) {
+            return response?.data
+        }
+    },
+
+    GetUserDetail: async () => {
+        const response = await axiosClient.get('/users/me')
+        return (response?.data ? response?.data : null)
+    },
+
+    Checkout: async (cartListArray) => {
+        const response = await axiosClient.post('/orders', {
+            products: cartListArray
+        })
+        return (response?.data ? response?.data : null)
     }
 };
 export default getDataService;

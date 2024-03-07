@@ -30,12 +30,19 @@ export function addToCart(id, quantity) {
     };
 }
 
-export function addToWishList(data) {
+export function updateToWishList(data, productId) {
     return {
-        type: types.ADD_TO_WISHLIST,
+        type: types.UPDATE_TO_WISHLIST,
         payload: {
-            data
+            data,
+            productId
         }
+    };
+}
+
+export function successGetToWishlist() {
+    return {
+        type: types.GET_TO_WISHLIST,
     };
 }
 

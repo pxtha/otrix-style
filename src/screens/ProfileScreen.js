@@ -35,7 +35,6 @@ function ProfileScreen(props) {
     const { userInfo } = props;
 
     useEffect(() => {
-        console.log(props.userInfo)
         let image = null;
         if (props.customerData && props.customerData.image != null) {
             if (props.customerData.creation == null || props.customerData.creation == 'D') {

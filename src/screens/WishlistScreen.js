@@ -1,4 +1,4 @@
-import { addToWishList } from '@actions';
+import { updateToWishList } from '@actions';
 import { GET_PRODUCTS } from '@apis/queries';
 import { useQuery } from '@apollo/client';
 import {
@@ -44,7 +44,7 @@ function WishlistScreen(props) {
 
     const onDeleteItem = async (id) => {
         let wishlistData = await _addToWishlist(id);
-        props.addToWishList(wishlistData);
+        props.updateToWishList(wishlistData, id);
     }
 
     return (
@@ -95,7 +95,7 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { addToWishList })(WishlistScreen);
+export default connect(mapStateToProps, { updateToWishList })(WishlistScreen);
 
 const styles = StyleSheet.create({
     noRecord: {

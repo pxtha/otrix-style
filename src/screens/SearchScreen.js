@@ -15,7 +15,7 @@ import { GlobalStyles, Colors } from '@helpers';
 import { _roundDimensions } from '@helpers/util';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Fonts from "@helpers/Fonts";
-import { addToWishList } from '@actions';
+import { updateToWishList } from '@actions';
 import { _getWishlist, _addToWishlist } from "@helpers/FunctionHelper";
 import MostSearchArr from '@component/items/MostSearchArr';
 import SearchProductsArr from '@component/items/SearchProductsArr';
@@ -107,7 +107,7 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(mapStateToProps, { addToWishList })(SearchScreen);
+export default connect(mapStateToProps, { updateToWishList })(SearchScreen);
 
 const styles = StyleSheet.create({
     headerView: {
