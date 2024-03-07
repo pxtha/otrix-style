@@ -138,28 +138,68 @@ const getDataService = {
     },
 
 
-    AddToCartList: async (userId, cartListArray) => {
-        try {
-            cartListArray.map(async (item) => {
-                const lastProductInCarOfUser = await axiosClient.get(`/carts?populate=*&filters[user_id][id][$eq]=${userId}&filters[product][id]=${item.product}`)
-                if (lastProductInCarOfUser?.data?.data?.length > 0) {
-                    const params = {
-                        quantity: item.amount,
-                    }
-                    await axiosClient.put(`/carts/${lastProductInCarOfUser?.data?.data[0]?.id}`, { data: params })
-                } else {
-                    const params = {
-                        user_id: userId,
-                        product: item.product,
-                        quantity: item.amount,
-                    }
-                    await axiosClient.post('/carts', { data: params })
-                }
-            })
-        } catch (e) {
-            console.log(e)
+    addToCartList: async (userId, product, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
         }
 
+        const responseCheck = await fetch(`${APP_URL_ENV}/api/carts?populate=*&filters[user_id][id][$eq]=${userId}&filters[product][id]=${product.id}`, {
+            headers: headers,
+            method: 'GET'
+        }).then(res => res.json());
+
+        if (responseCheck) {
+            if (responseCheck.data.length > 0) {
+                const payload = {
+                    data: {
+                        quantity: product.quantity,
+                    }
+                }
+                return fetch(`${APP_URL_ENV}/api/carts/${responseCheck.data[0]?.id}`, {
+                    headers: headers,
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                }).then(r => r.json()).catch(error => {
+                    console.error(error);
+                });
+            }
+            else {
+                const payload = {
+                    data: {
+                        user_id: userId,
+                        product: product.id,
+                        quantity: product.quantity,
+                    }
+                }
+                return fetch(`${APP_URL_ENV}/api/carts`, {
+                    headers: headers,
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                }).then(r => r.json()).catch(error => {
+                    console.error(error);
+                });
+            }
+        }
+    },
+
+    updateCart: (cartId, quantity, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+        const payload = {
+            data: {
+                quantity: quantity,
+            }
+        }
+        return fetch(`${APP_URL_ENV}/api/carts/${cartId}`, {
+            headers: headers,
+            method: 'PUT',
+            body: JSON.stringify(payload)
+        }).then(r => r.json()).catch(error => {
+            console.error(error);
+        });
     },
 
     removeWishList: async (productId, token) => {
@@ -176,13 +216,36 @@ const getDataService = {
         });
     },
 
-    RemoveCart: async (id, userid) => {
-        await axiosClient.get(`/carts?populate=*&filters[user_id][id][$eq]=${userid}&filters[product][id]=${id}`).then(
-            (response) => {
-                if (response?.data?.data?.length > 0) {
-                    axiosClient.delete('/carts/' + response?.data?.data[0]?.id)
-                }
-            })
+    removeCart: async (id, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+
+        return fetch(`${APP_URL_ENV}/api/carts/${id}`, {
+            method: "DELETE",
+            headers: headers,
+        }).then(r => r.json()).catch(error => {
+            console.error(error);
+        });
+    },
+
+    checkoutCart: async (listIds, token) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        }
+
+        const requestList = listIds.map((id) => {
+            let request = new Request(`${APP_URL_ENV}/api/carts/${id}`, {
+                method: "DELETE",
+                headers: headers,
+            });
+
+            return fetch(request).then(res => res.json());
+        })
+
+        return Promise.all(requestList);
     },
 
     getUserWishList: (id, token) => {
@@ -197,30 +260,27 @@ const getDataService = {
         }).then(r => r.json()).catch(error => {
             console.error(error);
         });
-
-        // const response = await axiosClient.get('/wishlists?populate[product][populate][0]=product_variants&populate[product][populate][1]=images&filters[user_id][id][$eq]=' + id)
-        // const wishlist = []
-        // if (response) {
-        //     response?.data.map((item) => (
-        //         wishlist.push(item?.attributes?.product?.data)
-        //     ))
-        // }
-        // return wishlist
     },
 
-    GetUserCart: async (id) => {
-        const response = await axiosClient.get('/carts?populate[product][populate]=*&populate[size]=*&populate[product_variant]=*&filters[user_id][id][$eq]=' + id)
-        if (response) {
-            return response?.data
+    getUserCart: async (id) => {
+        const headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
         }
+        return fetch(`${APP_URL_ENV}/api/carts?populate[product][populate]=*&populate[size]=*&populate[product_variant]=*&filters[user_id][id][$eq]=${id}`, {
+            method: "GET",
+            headers: headers,
+        }).then(r => r.json()).catch(error => {
+            console.error(error);
+        });
     },
 
-    GetUserDetail: async () => {
+    getUserDetail: async () => {
         const response = await axiosClient.get('/users/me')
         return (response?.data ? response?.data : null)
     },
 
-    Checkout: async (cartListArray) => {
+    checkout: async (cartListArray) => {
         const response = await axiosClient.post('/orders', {
             products: cartListArray
         })

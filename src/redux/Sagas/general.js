@@ -9,6 +9,7 @@ import * as RootNavigation from '../../AppNavigator';
 import { changeLanguage, getLanguage } from '../../locales/i18n';
 import getDataService from "../Api/getApi";
 import { wishlistMapping } from "@component/items/WishlistMapping";
+import { cartMapping } from "@component/items/CartMapping";
 
 export function* watchGeneralRequest() {
     yield takeEvery(types.REQUEST_INIT, requestInit);
@@ -75,7 +76,6 @@ function* requestInit(action) {
         }
 
         //Wishlist latest
-        yield put(successGetToWishlist())
 
         if (getAuth == 1) {
             yield put(authStatus(true));
@@ -84,6 +84,7 @@ function* requestInit(action) {
 
             yield put(authData(JSON.parse(getData)));
             yield put(authUserInfo(JSON.parse(userInfo)));
+            yield put(successGetToWishlist())
         }
         else {
             yield put(authStatus(false));
@@ -110,27 +111,20 @@ function* addToCart(action) {
     try {
         const { payload } = action;
         logfunction("Payload ==", payload)
-        //  
+
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+        const userId = JSON.parse(getAuth).user.id;
+        const responseSuccess = yield call(getDataService.addToCartList, userId, payload, token)
+        const cartConvert = cartMapping(responseSuccess?.data, payload.id)
+
         let getLocalCart = yield call(AsyncStorage.getItem, "CART_DATA")
-        logfunction("LOCAL CART  ", JSON.parse(getLocalCart));
         getLocalCart = JSON.parse(getLocalCart);
+
+        // logfunction("LOCAL CART  ", JSON.parse(getLocalCart));
         if (getLocalCart != null) {
-            // let findProduct = getLocalCart.cartProducts.filter(item => item.product_id.indexOf(payload.id) > -1);
-            let findProductIndex = getLocalCart.cartProducts.findIndex((item) => item.id === payload.id);
             let storeProducts = getLocalCart.cartProducts;
-            if (findProductIndex > -1) {
-                let quantity = parseInt(getLocalCart.cartProducts[findProductIndex].quantity);
-                logfunction("QTY", quantity)
-                getLocalCart.cartProducts.splice(findProductIndex, 1);
-                storeProducts.push({
-                    id: payload.id, quantity: quantity + parseInt(payload.quantity)
-                });
-            }
-            else {
-                storeProducts.push({
-                    id: payload.id, quantity: parseInt(payload.quantity)
-                });
-            }
+            storeProducts.push(cartConvert);
             let totalQty = parseInt(getLocalCart.totalCount);
             logfunction("TOTAL ", totalQty)
             let storeArr = { cartProducts: storeProducts, totalCount: totalQty + parseInt(payload.quantity) };
@@ -139,7 +133,7 @@ function* addToCart(action) {
             yield put(successCart(storeArr))
         }
         else {
-            let storeArr = { cartProducts: [{ id: payload.id, quantity: payload.quantity }], totalCount: payload.quantity };
+            let storeArr = { cartProducts: [cartConvert], totalCount: payload.quantity };
             logfunction("storeArr ", storeArr);
             AsyncStorage.setItem('CART_DATA', JSON.stringify(storeArr));
             yield put(successCart(storeArr));
@@ -153,18 +147,24 @@ function* addToCart(action) {
 function* removeFromCart(action) {
     try {
         const { payload } = action;
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+
         let newArr = [];
+        let cartId = -1;
         let getLocalCart = yield call(AsyncStorage.getItem, "CART_DATA")
         getLocalCart = JSON.parse(getLocalCart);
         let finalCount = getLocalCart.totalCount;
         logfunction("finalCount", finalCount)
         logfunction("getLocalCart", getLocalCart)
+
         getLocalCart.cartProducts.forEach(function (item, index) {
             if (item.id != payload.id) {
                 newArr.push(item);
             }
             else {
                 finalCount -= item.quantity;
+                cartId = item.cartId;
                 logfunction("ITEM TO DEELTE", item)
             }
         });
@@ -174,6 +174,7 @@ function* removeFromCart(action) {
         logfunction("NEW ARRR", newArr)
         let storeArr = { cartProducts: newArr, totalCount: finalCount };
         logfunction("ARR TO STORE ", storeArr)
+        yield call(getDataService.removeCart, cartId, token)
         AsyncStorage.setItem('CART_DATA', JSON.stringify(storeArr));
         yield put(successCart(storeArr));
 
@@ -185,7 +186,9 @@ function* removeFromCart(action) {
 function* incrementQuantity(action) {
     try {
         const { payload } = action;
-        let newArr = [];
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+
         let getLocalCart = yield call(AsyncStorage.getItem, "CART_DATA")
         getLocalCart = JSON.parse(getLocalCart);
         let finalCount = getLocalCart.totalCount;
@@ -201,7 +204,7 @@ function* incrementQuantity(action) {
         getLocalCart.cartProducts.splice(findProductIndex, 1, findProduct);
 
         let storeArr = { cartProducts: getLocalCart.cartProducts, totalCount: parseInt(finalCount) + 1 };
-
+        yield call(getDataService.updateCart, findProduct.cartId, findProduct.quantity, token)
         logfunction("ARR TO STORE ", storeArr)
         AsyncStorage.setItem('CART_DATA', JSON.stringify(storeArr));
         yield put(successCart(storeArr));
@@ -214,7 +217,9 @@ function* incrementQuantity(action) {
 function* decrementQuantity(action) {
     try {
         const { payload } = action;
-        let newArr = [];
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+
         let getLocalCart = yield call(AsyncStorage.getItem, "CART_DATA")
         getLocalCart = JSON.parse(getLocalCart);
         let finalCount = getLocalCart.totalCount;
@@ -232,6 +237,7 @@ function* decrementQuantity(action) {
         let storeArr = { cartProducts: getLocalCart.cartProducts, totalCount: finalCount - 1 };
 
         logfunction("ARR TO STORE ", storeArr)
+        yield call(getDataService.updateCart, findProduct.cartId, findProduct.quantity, token)
         AsyncStorage.setItem('CART_DATA', JSON.stringify(storeArr));
         yield put(successCart(storeArr));
 
@@ -243,6 +249,14 @@ function* decrementQuantity(action) {
 
 function* proceedCheckout(action) {
     try {
+        let getLocalCart = yield call(AsyncStorage.getItem, "CART_DATA")
+        getLocalCart = JSON.parse(getLocalCart);
+
+        let getAuth = yield call(AsyncStorage.getItem, "USER_INFO")
+        const token = JSON.parse(getAuth).jwt
+
+        const cartListIds = getLocalCart.cartProducts.map(v => v.cartId)
+        yield call(getDataService.checkoutCart, cartListIds, token)
         AsyncStorage.removeItem('CART_DATA');
         yield put(successCheckout());
 
